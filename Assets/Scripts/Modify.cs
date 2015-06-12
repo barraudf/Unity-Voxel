@@ -35,8 +35,5 @@ public class Modify : MonoBehaviour
             lastBlockHit.SetHighlight(false);
             lastBlockHit = null;
         }
-
-        transform.position += transform.forward * Input.GetAxis("Vertical");
-        transform.position += transform.right * Input.GetAxis("Horizontal");
     }
 }
