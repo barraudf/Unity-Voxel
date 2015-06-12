@@ -5,6 +5,7 @@ public class World : MonoBehaviour
 {
     #region Fields
     public GameObject ChunkPrefab;
+    public string worldName = "world";
 
     private Dictionary<Vector3i, Chunk> Chunks;
     #endregion Fields
@@ -18,6 +19,29 @@ public class World : MonoBehaviour
     void Start()
     {
         CreateSampleWorld();
+    }
+
+    public int newChunkX;
+    public int newChunkY;
+    public int newChunkZ;
+    public bool genChunk;
+    void Update()
+    {
+        if (genChunk)
+        {
+            genChunk = false;
+            Vector3i chunkPos = new Vector3i(newChunkX, newChunkY, newChunkZ);
+            Chunk chunk = null;
+
+            if (Chunks.TryGetValue(chunkPos, out chunk))
+            {
+                DestroyChunk(chunkPos);
+            }
+            else
+            {
+                CreateChunk(chunkPos);
+            }
+        }
     }
     #endregion MonoBehaviour
 
@@ -33,6 +57,20 @@ public class World : MonoBehaviour
         newChunk.World = this;
 
         Chunks.Add(position, newChunk);
+
+        for (int x = 0; x < Chunk.CHUNK_SIZE; x++)
+        for (int y = 0; y < Chunk.CHUNK_SIZE; y++)
+        for (int z = 0; z < Chunk.CHUNK_SIZE; z++)
+        {
+            Block block = y <= 7 ? (Block)new BlockGrass(newChunk) : (Block)new BlockAir(newChunk);
+            Vector3i blockPosition = new Vector3i(x, y, z);
+
+            SetBlock(position + blockPosition, block);
+        }
+
+        newChunk.SetBlocksUnmodified();
+
+        Serialization.Load(newChunk);
 
         return newChunk;
     }
@@ -58,6 +96,7 @@ public class World : MonoBehaviour
         Chunk chunk = null;
         if (Chunks.TryGetValue(position, out chunk))
         {
+            Serialization.SaveChunk(chunk);
             //Object pooling
             Object.Destroy(chunk.gameObject);
             Chunks.Remove(position);
@@ -163,28 +202,9 @@ public class World : MonoBehaviour
     private void CreateSampleWorld()
     {
         for (int x = -2; x < 2; x++)
-            for (int y = -1; y < 1; y++)
-                for (int z = -1; z < 1; z++)
-                    CreateSampleChunk(new Vector3i(x * Chunk.CHUNK_SIZE, y * Chunk.CHUNK_SIZE, z * Chunk.CHUNK_SIZE));
-
-        //CreateSampleChunk(new Vector3i(0,0,0));
-    }
-
-    private Chunk CreateSampleChunk(Vector3i chunkPosition)
-    {
-        Chunk chunk = CreateChunk(chunkPosition);
-
-        for (int x = 0; x < Chunk.CHUNK_SIZE; x++)
-        for (int y = 0; y < Chunk.CHUNK_SIZE; y++)
-        for (int z = 0; z < Chunk.CHUNK_SIZE; z++)
-        {
-            Block block = y <= 7 ? (Block)new BlockGrass(chunk) : (Block)new BlockAir(chunk);
-            Vector3i blockPosition = new Vector3i(x, y, z);
-
-            SetBlock(chunkPosition + blockPosition, block);
-        }
-
-        return chunk;
+        for (int y = -1; y < 1; y++)
+        for (int z = -1; z < 1; z++)
+            CreateChunk(new Vector3i(x * Chunk.CHUNK_SIZE, y * Chunk.CHUNK_SIZE, z * Chunk.CHUNK_SIZE));
     }
 
     void UpdateIfEqual(int value1, int value2, Vector3i pos)

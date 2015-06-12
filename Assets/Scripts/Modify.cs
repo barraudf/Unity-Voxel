@@ -3,8 +3,6 @@ using System.Collections.Generic;
 
 public class Modify : MonoBehaviour
 {
-    Vector2 rot;
-
     private Block lastBlockHit = null;
 
     void Update()
@@ -37,13 +35,6 @@ public class Modify : MonoBehaviour
             lastBlockHit.SetHighlight(false);
             lastBlockHit = null;
         }
-
-        rot = new Vector2(
-            rot.x + Input.GetAxis("Mouse X") * 7,
-            rot.y + Input.GetAxis("Mouse Y") * 7);
-
-        transform.localRotation = Quaternion.AngleAxis(rot.x, Vector3.up);
-        transform.localRotation *= Quaternion.AngleAxis(rot.y, Vector3.left);
 
         transform.position += transform.forward * Input.GetAxis("Vertical");
         transform.position += transform.right * Input.GetAxis("Horizontal");

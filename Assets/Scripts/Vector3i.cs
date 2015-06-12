@@ -1,18 +1,31 @@
 ﻿using UnityEngine;
+using System;
 
+[Serializable]
 public struct Vector3i
 {
     #region Fields
+    [NonSerialized]
     public static readonly Vector3i zero = new Vector3i(0, 0, 0);
+    [NonSerialized]
     public static readonly Vector3i one = new Vector3i(1, 1, 1);
+    [NonSerialized]
     public static readonly Vector3i unitX = new Vector3i(1, 0, 0);
+    [NonSerialized]
     public static readonly Vector3i unitY = new Vector3i(0, 1, 0);
+    [NonSerialized]
     public static readonly Vector3i unitZ = new Vector3i(0, 0, 1);
+    [NonSerialized]
     public static readonly Vector3i up = new Vector3i(0, 1, 0);
+    [NonSerialized]
     public static readonly Vector3i down = new Vector3i(0, -1, 0);
+    [NonSerialized]
     public static readonly Vector3i right = new Vector3i(1, 0, 0);
+    [NonSerialized]
     public static readonly Vector3i left = new Vector3i(-1, 0, 0);
+    [NonSerialized]
     public static readonly Vector3i forward = new Vector3i(0, 0, -1);
+    [NonSerialized]
     public static readonly Vector3i backward = new Vector3i(0, 0, 1);
 
     public int x;

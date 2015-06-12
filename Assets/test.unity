@@ -150,6 +150,7 @@ GameObject:
   - 124: {fileID: 1332644663}
   - 81: {fileID: 1332644662}
   - 114: {fileID: 1332644667}
+  - 114: {fileID: 1332644668}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -233,6 +234,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37c3ecf1a9a415248a69b31d590099ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1332644668
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1332644661}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68ec2fe99d1108b9d0006a298d76c639, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  axes: 0
+  sensitivityX: 7
+  sensitivityY: 7
+  minimumX: -360
+  maximumX: 360
+  minimumY: -60
+  maximumY: 60
 --- !u!1 &1663851939
 GameObject:
   m_ObjectHideFlags: 0
@@ -261,6 +280,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ChunkPrefab: {fileID: 107310, guid: b4e7bc66a44f26c4f8cad8619ddc2e25, type: 2}
+  worldName: world
+  newChunkX: -32
+  newChunkY: 0
+  newChunkZ: -16
+  genChunk: 0
 --- !u!4 &1663851941
 Transform:
   m_ObjectHideFlags: 0

@@ -13,7 +13,7 @@ GameObject:
   - 23: {fileID: 2307310}
   - 114: {fileID: 11407310}
   m_Layer: 0
-  m_Name: ChunkPrefab
+  m_Name: Chunk
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -82,7 +82,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01fb5ad67257c3540a395a79ecc015a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  UpdateNeeded: 1
   World: {fileID: 0}
 --- !u!1001 &100100000
 Prefab:

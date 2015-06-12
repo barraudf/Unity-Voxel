@@ -11,10 +11,10 @@ public class Chunk : MonoBehaviour
 
     public World World;
     public Vector3i Position;
+    public Block[, ,] Blocks;
 
     private bool UpdateNeeded = true;
 
-    private Block[, ,] Blocks;
     private MeshFilter Filter;
     private MeshCollider Collider;
     #endregion Fields
@@ -117,8 +117,19 @@ public class Chunk : MonoBehaviour
         return string.Format("Chunk({0},{1},{2})", Position.x, Position.y, Position.z);
     }
 
+    public string FileName()
+    {
+        return string.Format("{0},{1},{2}.chunk", Position.x, Position.y, Position.z);
+    }
+
     public void Invalidate()
     {
         UpdateNeeded = true;
+    }
+
+    public void SetBlocksUnmodified()
+    {
+        foreach (Block block in Blocks)
+            block.changed = false;
     }
 }
