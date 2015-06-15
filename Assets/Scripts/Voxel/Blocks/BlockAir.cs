@@ -4,8 +4,8 @@ using System;
 [Serializable]
 public class BlockAir : Block
 {
-    public BlockAir(Chunk parent)
-        : base(parent)
+    public BlockAir()
+        : base()
     {
 
     }

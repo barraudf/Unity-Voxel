@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 using SimplexNoise;
 
 public class TerrainGen
@@ -19,10 +20,10 @@ public class TerrainGen
     public Chunk ChunkGen(Chunk chunk)
     {
         for (int x = chunk.Position.x; x < chunk.Position.x + Chunk.CHUNK_SIZE; x++)
-        for (int z = chunk.Position.z; z < chunk.Position.z + Chunk.CHUNK_SIZE; z++)
-        {
-            chunk = ChunkColumnGen(chunk, x, z);
-        }
+            for (int z = chunk.Position.z; z < chunk.Position.z + Chunk.CHUNK_SIZE; z++)
+            {
+                chunk = ChunkColumnGen(chunk, x, z);
+            }
 
         return chunk;
     }
@@ -45,15 +46,15 @@ public class TerrainGen
             Vector3i position = new Vector3i(x, y, z) - chunk.Position;
             if (y <= stoneHeight)
             {
-                chunk.SetBlock(position, new Block(chunk));
+                chunk.SetBlock(position, new BlockRock());
             }
             else if (y <= dirtHeight)
             {
-                chunk.SetBlock(position, new BlockGrass(chunk));
+                chunk.SetBlock(position, new BlockGrass());
             }
             else
             {
-                chunk.SetBlock(position, new BlockAir(chunk));
+                chunk.SetBlock(position, new BlockAir());
             }
 
         }

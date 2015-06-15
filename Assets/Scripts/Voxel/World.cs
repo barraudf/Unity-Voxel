@@ -7,43 +7,13 @@ public class World : MonoBehaviour
     public GameObject ChunkPrefab;
     public string worldName = "world";
 
-    private Dictionary<Vector3i, Chunk> Chunks;
+    public Dictionary<Vector3i, Chunk> Chunks;
     #endregion Fields
 
     public World()
     {
         Chunks = new Dictionary<Vector3i, Chunk>();
     }
-
-    #region MonoBehaviour
-    void Start()
-    {
-        CreateSampleWorld();
-    }
-
-    public int newChunkX;
-    public int newChunkY;
-    public int newChunkZ;
-    public bool genChunk;
-    void Update()
-    {
-        if (genChunk)
-        {
-            genChunk = false;
-            Vector3i chunkPos = new Vector3i(newChunkX, newChunkY, newChunkZ);
-            Chunk chunk = null;
-
-            if (Chunks.TryGetValue(chunkPos, out chunk))
-            {
-                DestroyChunk(chunkPos);
-            }
-            else
-            {
-                CreateChunk(chunkPos);
-            }
-        }
-    }
-    #endregion MonoBehaviour
 
     #region Chunk management
     public Chunk CreateChunk(Vector3i position)
@@ -90,7 +60,8 @@ public class World : MonoBehaviour
         Chunk containerChunk = null;
 
         Chunks.TryGetValue(chunkPosition, out containerChunk);
-  
+
+        
         return containerChunk;
     }
 
@@ -115,12 +86,10 @@ public class World : MonoBehaviour
         if (containerChunk != null)
         {
             Block chunkBlock = containerChunk.GetBlock(blockPosition - containerChunk.Position);
-
-            if (chunkBlock != null)
             return chunkBlock;
         }
 
-        return new BlockAir(null);
+        return new BlockAir();
     }
 
     public void SetBlock(Vector3i blockPosition, Block block)

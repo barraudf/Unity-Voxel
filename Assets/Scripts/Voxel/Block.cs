@@ -8,6 +8,10 @@ public class Block
 {
     #region Fields
     [NonSerialized]
+    public bool changed = true;
+
+
+    [NonSerialized]
     private static Vector3 v1 = new Vector3(-0.5f, -0.5f, -0.5f);
     [NonSerialized]
     private static Vector3 v2 = new Vector3(-0.5f, -0.5f,  0.5f);
@@ -25,17 +29,12 @@ public class Block
     private static Vector3 v8 = new Vector3( 0.5f,  0.5f,  0.5f);
 
     [NonSerialized]
-    public Chunk Chunk;
-    public bool changed = true;
-
-    [NonSerialized]
-    protected bool Highlight;
+    protected Color32 Color;
     #endregion Fields
 
-    public Block(Chunk parent)
+    public Block()
     {
-        Highlight = false;
-        Chunk = parent;
+        Color = new Color32() { a = 255, r = 255, g = 255, b = 255 };
     }
 
     public virtual MeshData BlockData (Chunk chunk, Vector3i position, MeshData meshData)
@@ -71,7 +70,7 @@ public class Block
         meshData.AddVertex(position + v7);
         meshData.AddVertex(position + v3);
 
-        meshData.AddQuadColors(Highlight ? GetHighlightColor() : GetBlockColor());
+        meshData.AddQuadColors(Color);
         meshData.AddQuadTriangles();
 
         return meshData;
@@ -84,7 +83,7 @@ public class Block
         meshData.AddVertex(position + v6);
         meshData.AddVertex(position + v2);
 
-        meshData.AddQuadColors(Highlight ? GetHighlightColor() : GetBlockColor());
+        meshData.AddQuadColors(Color);
         meshData.AddQuadTriangles();
 
         return meshData;
@@ -97,7 +96,7 @@ public class Block
         meshData.AddVertex(position + v4);
         meshData.AddVertex(position + v2);
 
-        meshData.AddQuadColors(Highlight ? GetHighlightColor() : GetBlockColor());
+        meshData.AddQuadColors(Color);
         meshData.AddQuadTriangles();
 
         return meshData;
@@ -110,7 +109,7 @@ public class Block
         meshData.AddVertex(position + v8);
         meshData.AddVertex(position + v6);
 
-        meshData.AddQuadColors(Highlight ? GetHighlightColor() : GetBlockColor());
+        meshData.AddQuadColors(Color);
         meshData.AddQuadTriangles();
 
         return meshData;
@@ -123,7 +122,7 @@ public class Block
         meshData.AddVertex(position + v7);
         meshData.AddVertex(position + v5);
 
-        meshData.AddQuadColors(Highlight ? GetHighlightColor() : GetBlockColor());
+        meshData.AddQuadColors(Color);
         meshData.AddQuadTriangles();
 
         return meshData;
@@ -136,7 +135,7 @@ public class Block
         meshData.AddVertex(position + v3);
         meshData.AddVertex(position + v1);
 
-        meshData.AddQuadColors(Highlight ? GetHighlightColor() : GetBlockColor());
+        meshData.AddQuadColors(Color);
         meshData.AddQuadTriangles();
 
         return meshData;
@@ -146,22 +145,5 @@ public class Block
     public virtual bool IsSolid(Direction direction)
     {
         return true;
-    }
-
-    public void SetHighlight(bool value)
-    {
-        Highlight = value;
-        if(Chunk != null)
-            Chunk.Invalidate();
-    }
-
-    protected virtual Color32 GetBlockColor()
-    {
-        return new Color32() { a = 255, r = 255, g = 255, b = 255 };
-    }
-
-    protected virtual Color32 GetHighlightColor()
-    {
-        return new Color32() { a = 255, r = 255, g = 0, b = 0 };
     }
 }

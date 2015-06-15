@@ -52,6 +52,9 @@ public struct Vector3i
     /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
     public override bool Equals(object obj)
     {
+        if (GetHashCode() != obj.GetHashCode())
+            return false;
+
         if (!(obj is Vector3i))
             return false;
 
@@ -66,6 +69,9 @@ public struct Vector3i
     /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
     public bool Equals(Vector3i other)
     {
+        if (GetHashCode() != other.GetHashCode())
+            return false;
+
         return x == other.x && y == other.y && z == other.z;
     }
 
@@ -80,24 +86,36 @@ public struct Vector3i
     }
 
     #region Operators
-    public static Vector3i operator +(Vector3i v1, Vector3i v2)
+    public static Vector3i operator +(Vector3i value1, Vector3i value2)
     {
-        return new Vector3i(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
+        value1.x += value2.x;
+        value1.y += value2.y;
+        value1.z += value2.z;
+        return value1;
     }
 
-    public static Vector3 operator +(Vector3i v1, Vector3 v2)
+    public static Vector3 operator +(Vector3i value1, Vector3 value2)
     {
-        return new Vector3(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
+        value2.x += value1.x;
+        value2.y += value1.y;
+        value2.z += value1.z;
+        return value2;
     }
 
-    public static Vector3i operator -(Vector3i v1, Vector3i v2)
+    public static Vector3i operator -(Vector3i value1, Vector3i value2)
     {
-        return new Vector3i(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+        value1.x -= value2.x;
+        value1.y -= value2.y;
+        value1.z -= value2.z;
+        return value1;
     }
 
-    public static Vector3i operator *(Vector3i v1, int i)
+    public static Vector3i operator *(Vector3i value1, int scaleFactor)
     {
-        return new Vector3i(v1.x * i, v1.y * i, v1.z * i);
+        value1.x *= scaleFactor;
+        value1.y *= scaleFactor;
+        value1.z *= scaleFactor;
+        return value1;
     }
     #endregion Operators
 

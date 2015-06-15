@@ -7,7 +7,7 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: StandardBlock
-  m_Shader: {fileID: 4800000, guid: 187bdb468403f0141a2f80d43a91c852, type: 3}
+  m_Shader: {fileID: 4800000, guid: 09929be075aa75e4993d4311dcf14b74, type: 3}
   m_ShaderKeywords: []
   m_CustomRenderQueue: -1
   m_SavedProperties:

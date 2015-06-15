@@ -4,14 +4,9 @@ using System;
 [Serializable]
 public class BlockRock : Block
 {
-    public BlockRock(Chunk parent)
-        : base(parent)
+    public BlockRock()
+        : base()
     {
-
-    }
-
-    protected override Color32 GetBlockColor()
-    {
-        return new Color32() { a = 255, r = 127, g = 127, b = 127 };
+        Color = new Color32() { a = 255, r = 127, g = 127, b = 127 };
     }
 }

@@ -13,7 +13,8 @@ public class Chunk : MonoBehaviour
     public Vector3i Position;
     public Block[, ,] Blocks;
 
-    private bool UpdateNeeded = true;
+    private bool UpdateNeeded = false;
+    public bool rendered;
 
     private MeshFilter Filter;
     private MeshCollider Collider;
@@ -47,14 +48,15 @@ public class Chunk : MonoBehaviour
     //Updates the chunk based on its contents
     private void UpdateChunk()
     {
+        rendered = true;
         MeshData meshData = new MeshData();
 
         for (int x = 0; x < CHUNK_SIZE; x++)
-            for (int y = 0; y < CHUNK_SIZE; y++)
-                for (int z = 0; z < CHUNK_SIZE; z++)
-                {
-                    meshData = Blocks[x, y, z].BlockData(this, new Vector3i(x, y, z), meshData);
-                }
+        for (int y = 0; y < CHUNK_SIZE; y++)
+        for (int z = 0; z < CHUNK_SIZE; z++)
+        {
+            meshData = Blocks[x, y, z].BlockData(this, new Vector3i(x, y, z), meshData);
+        }
 
         RenderMesh(meshData);
     }
@@ -83,14 +85,9 @@ public class Chunk : MonoBehaviour
     public void SetBlock(Vector3i blockPosition, Block block)
     {
         if (InRange(blockPosition.x) && InRange(blockPosition.y) && InRange(blockPosition.z))
-        {
             Blocks[blockPosition.x, blockPosition.y, blockPosition.z] = block;
-            UpdateNeeded = true;
-        }
         else
-        {
             World.SetBlock(Position + blockPosition, block);
-        }
     }
 
     public Block GetBlock(Vector3i blockPosition)

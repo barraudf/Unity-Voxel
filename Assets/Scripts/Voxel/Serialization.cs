@@ -48,12 +48,11 @@ public static class Serialization
             foreach (var block in save.Blocks)
             {
                 chunk.Blocks[block.Key.x, block.Key.y, block.Key.z] = block.Value;
+                chunk.Blocks[block.Key.x, block.Key.y, block.Key.z].changed = true;
             }
             stream.Close();
         }
 
-        foreach (Block b in chunk.Blocks)
-            b.Chunk = chunk;
         return true;
     }
 

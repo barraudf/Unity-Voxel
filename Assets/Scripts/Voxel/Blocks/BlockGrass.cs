@@ -4,13 +4,9 @@ using System;
 [Serializable]
 public class BlockGrass : Block
 {
-    public BlockGrass(Chunk parent)
-        : base(parent)
+    public BlockGrass()
+        : base()
     {
-    }
-    
-    protected override Color32 GetBlockColor()
-    {
-        return new Color32() { a = 255, r = 0, g = 255, b = 0 };
+        Color = new Color32() { a = 255, r = 0, g = 255, b = 0 };
     }
 }

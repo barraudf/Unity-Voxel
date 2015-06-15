@@ -3,8 +3,7 @@ using System.Collections.Generic;
 
 public class Modify : MonoBehaviour
 {
-    private Block lastBlockHit = null;
-
+    Vector2 rot;
     void Update()
     {
         RaycastHit hit;
@@ -13,27 +12,19 @@ public class Modify : MonoBehaviour
             Chunk chunk = hit.collider.GetComponent<Chunk>();
 
             if (chunk != null && Input.GetMouseButtonDown(0))
-                    World.SetBlock(hit, new BlockAir(chunk));
+                    World.SetBlock(hit, new BlockAir());
             else if (chunk != null && Input.GetMouseButtonDown(1))
-                    World.SetBlock(hit, new BlockGrass(chunk), true);
-            else
-            {
-                Block b = World.GetBlock(hit);
-                if(b != null && b != lastBlockHit)
-                {
-                    b.SetHighlight(true);
-
-                    if(lastBlockHit != null)
-                        lastBlockHit.SetHighlight(false);
-
-                    lastBlockHit = b;
-                }
-            }
+                    World.SetBlock(hit, new BlockGrass(), true);
         }
-        else if(lastBlockHit != null)
-        {
-            lastBlockHit.SetHighlight(false);
-            lastBlockHit = null;
-        }
+
+        rot = new Vector2(
+            rot.x + Input.GetAxis("Mouse X") * 3,
+            rot.y + Input.GetAxis("Mouse Y") * 3);
+
+        transform.localRotation = Quaternion.AngleAxis(rot.x, Vector3.up);
+        transform.localRotation *= Quaternion.AngleAxis(rot.y, Vector3.left);
+
+        transform.position += transform.forward * 3 * Input.GetAxis("Vertical");
+        transform.position += transform.right * 3 * Input.GetAxis("Horizontal");
     }
 }
