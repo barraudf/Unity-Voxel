@@ -60,9 +60,9 @@ public class LoadChunks : MonoBehaviour
     {
         //Get the position of this gameobject to generate around
         Vector3i playerPos = new Vector3i(
-            Mathf.FloorToInt(transform.position.x / Chunk.CHUNK_SIZE) * Chunk.CHUNK_SIZE,
-            Mathf.FloorToInt(transform.position.y / Chunk.CHUNK_SIZE) * Chunk.CHUNK_SIZE,
-            Mathf.FloorToInt(transform.position.z / Chunk.CHUNK_SIZE) * Chunk.CHUNK_SIZE
+            Mathf.FloorToInt(transform.position.x / Chunk.CHUNK_SIZE_H) * Chunk.CHUNK_SIZE_H,
+            Mathf.FloorToInt(transform.position.y / Chunk.CHUNK_SIZE_V) * Chunk.CHUNK_SIZE_V,
+            Mathf.FloorToInt(transform.position.z / Chunk.CHUNK_SIZE_H) * Chunk.CHUNK_SIZE_H
             );
 
         //If there aren't already chunks to generate
@@ -73,9 +73,9 @@ public class LoadChunks : MonoBehaviour
             {
                 //translate the player position and array position into chunk position
                 Vector3i newChunkPos = new Vector3i(
-                    chunkPositions[i].x * Chunk.CHUNK_SIZE + playerPos.x,
+                    chunkPositions[i].x * Chunk.CHUNK_SIZE_H + playerPos.x,
                     0,
-                    chunkPositions[i].z * Chunk.CHUNK_SIZE + playerPos.z
+                    chunkPositions[i].z * Chunk.CHUNK_SIZE_H + playerPos.z
                     );
 
                 //Get the chunk in the defined position
@@ -88,18 +88,18 @@ public class LoadChunks : MonoBehaviour
                     continue;
 
                 //load a column of chunks in this position
-                for (int y = -4; y < 4; y++)
+                for (int y = 0; y < 1; y++)
                 {
-                    for (int x = newChunkPos.x - Chunk.CHUNK_SIZE; x <= newChunkPos.x + Chunk.CHUNK_SIZE; x += Chunk.CHUNK_SIZE)
+                    for (int x = newChunkPos.x - Chunk.CHUNK_SIZE_H; x <= newChunkPos.x + Chunk.CHUNK_SIZE_H; x += Chunk.CHUNK_SIZE_H)
                     {
-                        for (int z = newChunkPos.z - Chunk.CHUNK_SIZE; z <= newChunkPos.z + Chunk.CHUNK_SIZE; z += Chunk.CHUNK_SIZE)
+                        for (int z = newChunkPos.z - Chunk.CHUNK_SIZE_H; z <= newChunkPos.z + Chunk.CHUNK_SIZE_H; z += Chunk.CHUNK_SIZE_H)
                         {
                             buildList.Add(new Vector3i(
-                                x, y * Chunk.CHUNK_SIZE, z));
+                                x, y * Chunk.CHUNK_SIZE_V, z));
                         }
                     }
                     updateList.Add(new Vector3i(
-                                newChunkPos.x, y * Chunk.CHUNK_SIZE, newChunkPos.z));
+                                newChunkPos.x, y * Chunk.CHUNK_SIZE_V, newChunkPos.z));
                 }
                 return;
             }

@@ -50,10 +50,11 @@ public class World : MonoBehaviour
 
     public Chunk GetChunk(Vector3i blockPosition)
     {
-        float chunkSizeF = Chunk.CHUNK_SIZE;
-        int x = Mathf.FloorToInt(blockPosition.x / chunkSizeF) * Chunk.CHUNK_SIZE;
-        int y = Mathf.FloorToInt(blockPosition.y / chunkSizeF) * Chunk.CHUNK_SIZE;
-        int z = Mathf.FloorToInt(blockPosition.z / chunkSizeF) * Chunk.CHUNK_SIZE;
+        float chunkSizeF = Chunk.CHUNK_SIZE_H;
+        float chunkSizeVF = Chunk.CHUNK_SIZE_V;
+        int x = Mathf.FloorToInt(blockPosition.x / chunkSizeF) * Chunk.CHUNK_SIZE_H;
+        int y = Mathf.FloorToInt(blockPosition.y / chunkSizeVF) * Chunk.CHUNK_SIZE_V;
+        int z = Mathf.FloorToInt(blockPosition.z / chunkSizeF) * Chunk.CHUNK_SIZE_H;
 
         Vector3i chunkPosition = new Vector3i(x,y,z);
  
@@ -101,11 +102,11 @@ public class World : MonoBehaviour
             chunk.SetBlock(blockPosition - chunk.Position, block);
 
             UpdateIfEqual(blockPosition.x - chunk.Position.x, 0, blockPosition + Vector3i.left);
-            UpdateIfEqual(blockPosition.x - chunk.Position.x, Chunk.CHUNK_SIZE - 1, blockPosition + Vector3i.right);
+            UpdateIfEqual(blockPosition.x - chunk.Position.x, Chunk.CHUNK_SIZE_H - 1, blockPosition + Vector3i.right);
             UpdateIfEqual(blockPosition.y - chunk.Position.y, 0, blockPosition + Vector3i.down);
-            UpdateIfEqual(blockPosition.y - chunk.Position.y, Chunk.CHUNK_SIZE - 1, blockPosition + Vector3i.up);
+            UpdateIfEqual(blockPosition.y - chunk.Position.y, Chunk.CHUNK_SIZE_V - 1, blockPosition + Vector3i.up);
             UpdateIfEqual(blockPosition.z - chunk.Position.z, 0, blockPosition + Vector3i.forward);
-            UpdateIfEqual(blockPosition.z - chunk.Position.z, Chunk.CHUNK_SIZE - 1, blockPosition + Vector3i.backward);
+            UpdateIfEqual(blockPosition.z - chunk.Position.z, Chunk.CHUNK_SIZE_H - 1, blockPosition + Vector3i.backward);
         }
     }
 
@@ -174,9 +175,8 @@ public class World : MonoBehaviour
     private void CreateSampleWorld()
     {
         for (int x = -4; x < 4; x++)
-        for (int y = -1; y < 3; y++)
         for (int z = -4; z < 4; z++)
-            CreateChunk(new Vector3i(x * Chunk.CHUNK_SIZE, y * Chunk.CHUNK_SIZE, z * Chunk.CHUNK_SIZE));
+            CreateChunk(new Vector3i(x * Chunk.CHUNK_SIZE_H, 0, z * Chunk.CHUNK_SIZE_H));
     }
 
     void UpdateIfEqual(int value1, int value2, Vector3i pos)

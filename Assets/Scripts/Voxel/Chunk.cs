@@ -7,7 +7,8 @@ using System.Collections;
 public class Chunk : MonoBehaviour
 {
     #region Fields
-    public const int CHUNK_SIZE = 16;
+    public const int CHUNK_SIZE_H = 16;
+    public const int CHUNK_SIZE_V = 128;
 
     public World World;
     public Vector3i Position;
@@ -22,7 +23,7 @@ public class Chunk : MonoBehaviour
 
     public Chunk()
     {
-        Blocks = new Block[CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE];
+        Blocks = new Block[CHUNK_SIZE_H, CHUNK_SIZE_V, CHUNK_SIZE_H];
     }
 
     #region MonoBehaviour
@@ -51,9 +52,9 @@ public class Chunk : MonoBehaviour
         rendered = true;
         MeshData meshData = new MeshData();
 
-        for (int x = 0; x < CHUNK_SIZE; x++)
-        for (int y = 0; y < CHUNK_SIZE; y++)
-        for (int z = 0; z < CHUNK_SIZE; z++)
+        for (int x = 0; x < CHUNK_SIZE_H; x++)
+        for (int y = 0; y < CHUNK_SIZE_V; y++)
+        for (int z = 0; z < CHUNK_SIZE_H; z++)
         {
             meshData = Blocks[x, y, z].BlockData(this, new Vector3i(x, y, z), meshData);
         }
@@ -84,7 +85,7 @@ public class Chunk : MonoBehaviour
     #region Block Management
     public void SetBlock(Vector3i blockPosition, Block block)
     {
-        if (InRange(blockPosition.x) && InRange(blockPosition.y) && InRange(blockPosition.z))
+        if (InRange(blockPosition.x) && InRangeV(blockPosition.y) && InRange(blockPosition.z))
             Blocks[blockPosition.x, blockPosition.y, blockPosition.z] = block;
         else
             World.SetBlock(Position + blockPosition, block);
@@ -92,7 +93,7 @@ public class Chunk : MonoBehaviour
 
     public Block GetBlock(Vector3i blockPosition)
     {
-        if (InRange(blockPosition.x) && InRange(blockPosition.y) && InRange(blockPosition.z))
+        if (InRange(blockPosition.x) && InRangeV(blockPosition.y) && InRange(blockPosition.z))
             return Blocks[blockPosition.x, blockPosition.y, blockPosition.z];
 
         Block ret = World.GetBlock(Position + blockPosition);
@@ -103,7 +104,15 @@ public class Chunk : MonoBehaviour
 
     public static bool InRange(int index)
     {
-        if (index < 0 || index >= CHUNK_SIZE)
+        if (index < 0 || index >= CHUNK_SIZE_H)
+            return false;
+
+        return true;
+    }
+
+    public static bool InRangeV(int index)
+    {
+        if (index < 0 || index >= CHUNK_SIZE_V)
             return false;
 
         return true;

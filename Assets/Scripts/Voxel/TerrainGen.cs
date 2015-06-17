@@ -5,13 +5,13 @@ using SimplexNoise;
 
 public class TerrainGen
 {
-    float stoneBaseHeight = -24;
+    float stoneBaseHeight = 42;
     float stoneBaseNoise = 0.05f;
     float stoneBaseNoiseHeight = 4;
 
     float stoneMountainHeight = 48;
     float stoneMountainFrequency = 0.008f;
-    float stoneMinHeight = -12;
+    float stoneMinHeight = 30;
 
     float dirtBaseHeight = 1;
     float dirtNoise = 0.04f;
@@ -19,8 +19,8 @@ public class TerrainGen
 
     public Chunk ChunkGen(Chunk chunk)
     {
-        for (int x = chunk.Position.x; x < chunk.Position.x + Chunk.CHUNK_SIZE; x++)
-            for (int z = chunk.Position.z; z < chunk.Position.z + Chunk.CHUNK_SIZE; z++)
+        for (int x = chunk.Position.x; x < chunk.Position.x + Chunk.CHUNK_SIZE_H; x++)
+            for (int z = chunk.Position.z; z < chunk.Position.z + Chunk.CHUNK_SIZE_H; z++)
             {
                 chunk = ChunkColumnGen(chunk, x, z);
             }
@@ -41,7 +41,7 @@ public class TerrainGen
         int dirtHeight = stoneHeight + Mathf.FloorToInt(dirtBaseHeight);
         dirtHeight += GetNoise(new Vector3i(x, 100, z), dirtNoise, Mathf.FloorToInt(dirtNoiseHeight));
 
-        for (int y = chunk.Position.y; y < chunk.Position.y + Chunk.CHUNK_SIZE; y++)
+        for (int y = chunk.Position.y; y < chunk.Position.y + Chunk.CHUNK_SIZE_V; y++)
         {
             Vector3i position = new Vector3i(x, y, z) - chunk.Position;
             if (y <= stoneHeight)
