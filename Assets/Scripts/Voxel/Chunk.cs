@@ -14,7 +14,7 @@ public class Chunk : MonoBehaviour
     public Vector3i Position;
     public Block[, ,] Blocks;
 
-    private bool UpdateNeeded = false;
+    public bool UpdateNeeded = false;
     public bool rendered;
 
     private MeshFilter Filter;
@@ -126,11 +126,6 @@ public class Chunk : MonoBehaviour
     public string FileName()
     {
         return string.Format("{0},{1},{2}.chunk", Position.x, Position.y, Position.z);
-    }
-
-    public void Invalidate()
-    {
-        UpdateNeeded = true;
     }
 
     public void SetBlocksUnmodified()

@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 public class LoadChunks : MonoBehaviour
 {
     public World world;
 
-    private List<Vector3i> updateList;
-    private List<Vector3i> buildList;
+    private ConcurrentQueue<Vector3i> updateList;
+    private ConcurrentQueue<Vector3i> buildList;
     int timer = 0;
 
     private static Vector3i[] chunkPositions = {   new Vector3i( 0, 0,  0), new Vector3i(-1, 0,  0), new Vector3i( 0, 0, -1), new Vector3i( 0, 0,  1), new Vector3i( 1, 0,  0),
@@ -52,8 +53,8 @@ public class LoadChunks : MonoBehaviour
 
     public LoadChunks()
     {
-        updateList = new List<Vector3i>();
-        buildList = new List<Vector3i>();
+        updateList = new ConcurrentQueue<Vector3i>();
+        buildList = new ConcurrentQueue<Vector3i>();
     }
 
     void FindChunksToLoad()
@@ -83,55 +84,58 @@ public class LoadChunks : MonoBehaviour
 
                 //If the chunk already exists and it's already
                 //rendered or in queue to be rendered continue
-                if (newChunk != null
-                    && (newChunk.rendered || updateList.Contains(newChunkPos)))
+                if (newChunk != null && newChunk.rendered)
                     continue;
 
                 //load a column of chunks in this position
-                for (int y = 0; y < 1; y++)
+                for (int x = newChunkPos.x - Chunk.CHUNK_SIZE_H; x <= newChunkPos.x + Chunk.CHUNK_SIZE_H; x += Chunk.CHUNK_SIZE_H)
+                for (int z = newChunkPos.z - Chunk.CHUNK_SIZE_H; z <= newChunkPos.z + Chunk.CHUNK_SIZE_H; z += Chunk.CHUNK_SIZE_H)
                 {
-                    for (int x = newChunkPos.x - Chunk.CHUNK_SIZE_H; x <= newChunkPos.x + Chunk.CHUNK_SIZE_H; x += Chunk.CHUNK_SIZE_H)
-                    {
-                        for (int z = newChunkPos.z - Chunk.CHUNK_SIZE_H; z <= newChunkPos.z + Chunk.CHUNK_SIZE_H; z += Chunk.CHUNK_SIZE_H)
-                        {
-                            buildList.Add(new Vector3i(
-                                x, y * Chunk.CHUNK_SIZE_V, z));
-                        }
-                    }
-                    updateList.Add(new Vector3i(
-                                newChunkPos.x, y * Chunk.CHUNK_SIZE_V, newChunkPos.z));
+                    buildList.Enqueue(new Vector3i(x, 0, z));
                 }
+                updateList.Enqueue(new Vector3i(newChunkPos.x, 0, newChunkPos.z));
                 return;
             }
         }
     }
 
-    void BuildChunk(Vector3i pos)
+    bool BuildChunk(Vector3i pos)
     {
         if (world.GetChunk(pos) == null)
+        {
             world.CreateChunk(pos);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     void LoadAndRenderChunks()
     {
-        if (buildList.Count != 0)
+        Vector3i chunkPos;
+        while (buildList.TryDequeue(out chunkPos))
         {
-            for (int i = 0; i < buildList.Count && i < 8; i++)
-            {
-                BuildChunk(buildList[0]);
-                buildList.RemoveAt(0);
-            }
+            if (!BuildChunk(chunkPos))
+                continue;
 
             //If chunks were built return early
             return;
         }
 
-        if (updateList.Count != 0)
+        while (updateList.TryDequeue(out chunkPos))
         {
-            Chunk chunk = world.GetChunk(updateList[0]);
+            Chunk chunk = world.GetChunk(chunkPos);
             if (chunk != null)
-                chunk.Invalidate();
-            updateList.RemoveAt(0);
+            {
+                if (chunk.UpdateNeeded == true)
+                    continue;
+
+                chunk.UpdateNeeded = true;
+
+                return;
+            }
         }
     }
 

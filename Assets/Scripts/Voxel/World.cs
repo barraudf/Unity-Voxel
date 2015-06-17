@@ -185,7 +185,7 @@ public class World : MonoBehaviour
         {
             Chunk chunk = GetChunk(pos);
             if (chunk != null)
-                chunk.Invalidate();
+                chunk.UpdateNeeded = true;
         }
     }
 }
