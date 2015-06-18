@@ -119,6 +119,20 @@ public struct Vector3i
     }
     #endregion Operators
 
+    public static double DistanceSquared(Vector3i value1, Vector3i value2)
+    {
+        double result;
+        DistanceSquared(ref value1, ref value2, out result);
+        return result;
+    }
+
+    public static void DistanceSquared(ref Vector3i value1, ref Vector3i value2, out double result)
+    {
+        result = (value1.x - value2.x) * (value1.x - value2.x) +
+                 (value1.y - value2.y) * (value1.y - value2.y) +
+                 (value1.z - value2.z) * (value1.z - value2.z);
+    }
+
     public override string ToString()
     {
         return string.Format("Vector3i({0},{1},{2})", x, y, z);

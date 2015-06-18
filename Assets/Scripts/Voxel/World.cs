@@ -28,16 +28,6 @@ public class World : MonoBehaviour
 
         Chunks.Add(position, newChunk);
 
-        //for (int x = 0; x < Chunk.CHUNK_SIZE; x++)
-        //for (int y = 0; y < Chunk.CHUNK_SIZE; y++)
-        //for (int z = 0; z < Chunk.CHUNK_SIZE; z++)
-        //{
-        //    Block block = y <= 7 ? (Block)new BlockGrass(newChunk) : (Block)new BlockAir(newChunk);
-        //    Vector3i blockPosition = new Vector3i(x, y, z);
-
-        //    SetBlock(position + blockPosition, block);
-        //}
-
         var terrainGen = new TerrainGen();
         newChunk = terrainGen.ChunkGen(newChunk);
 
