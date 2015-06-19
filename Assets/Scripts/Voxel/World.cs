@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public class World : MonoBehaviour
 {
     #region Fields
-    public GameObject ChunkPrefab;
+    public ObjectPooling ChunkPool;
     public string worldName = "world";
 
     public Dictionary<Vector3i, Chunk> Chunks;
@@ -18,8 +18,11 @@ public class World : MonoBehaviour
     #region Chunk management
     public Chunk CreateChunk(Vector3i position)
     {
-        //TODO: object pooling!
-        GameObject newChunkObject = Instantiate(ChunkPrefab, position.ToVector3(), Quaternion.Euler(Vector3.zero)) as GameObject;
+        GameObject newChunkObject = ChunkPool.NextObject();
+        if (Object.ReferenceEquals(newChunkObject, null))
+            return null;
+
+        newChunkObject.transform.position = position.ToVector3();
 
         Chunk newChunk = newChunkObject.GetComponent<Chunk>();
 
@@ -62,8 +65,8 @@ public class World : MonoBehaviour
         if (Chunks.TryGetValue(position, out chunk))
         {
             Serialization.SaveChunk(chunk);
-            //Object pooling
-            Object.Destroy(chunk.gameObject);
+            chunk.gameObject.SetActive(false);
+            chunk.Clear();
             Chunks.Remove(position);
         }
     }
@@ -161,13 +164,6 @@ public class World : MonoBehaviour
         return block;
     }
     #endregion Block management
-
-    private void CreateSampleWorld()
-    {
-        for (int x = -4; x < 4; x++)
-        for (int z = -4; z < 4; z++)
-            CreateChunk(new Vector3i(x * Chunk.CHUNK_SIZE_H, 0, z * Chunk.CHUNK_SIZE_H));
-    }
 
     void UpdateIfEqual(int value1, int value2, Vector3i pos)
     {

@@ -26,5 +26,6 @@ public class Modify : MonoBehaviour
 
         transform.position += transform.forward * 3 * Input.GetAxis("Vertical");
         transform.position += transform.right * 3 * Input.GetAxis("Horizontal");
+        transform.position += transform.up* 3 * Input.GetAxis("Jump");
     }
 }

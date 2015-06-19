@@ -147,6 +147,49 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
+--- !u!1 &415518692
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 415518694}
+  - 114: {fileID: 415518693}
+  m_Layer: 0
+  m_Name: Chunks
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &415518693
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 415518692}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bf934b529f8d2f46af3a90809c284ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PoolSize: 500
+  PrePopulate: 1
+  CanGrow: 1
+  Prefab: {fileID: 107310, guid: b4e7bc66a44f26c4f8cad8619ddc2e25, type: 2}
+--- !u!4 &415518694
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 415518692}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
 --- !u!1 &742698141
 GameObject:
   m_ObjectHideFlags: 0
@@ -391,7 +434,7 @@ Transform:
   m_Children:
   - {fileID: 742698147}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
 --- !u!114 &1428714117
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -520,7 +563,7 @@ GameObject:
   - 4: {fileID: 1663851941}
   - 114: {fileID: 1663851940}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: WorldManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -537,7 +580,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18988d2b028894b4881a809a51d6ca46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ChunkPrefab: {fileID: 107310, guid: b4e7bc66a44f26c4f8cad8619ddc2e25, type: 2}
+  ChunkPool: {fileID: 415518693}
   worldName: world
 --- !u!4 &1663851941
 Transform:
@@ -550,4 +593,4 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 4

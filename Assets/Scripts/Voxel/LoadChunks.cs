@@ -72,8 +72,8 @@ public class LoadChunks : MonoBehaviour
     {
         if (world.GetChunk(pos) == null)
         {
-            world.CreateChunk(pos);
-            return true;
+            Chunk newChunk = world.CreateChunk(pos);
+            return Object.ReferenceEquals(newChunk, null) == false;
         }
         else
         {

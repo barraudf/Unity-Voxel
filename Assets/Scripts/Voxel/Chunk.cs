@@ -23,7 +23,7 @@ public class Chunk : MonoBehaviour
 
     public Chunk()
     {
-        Blocks = new Block[CHUNK_SIZE_H, CHUNK_SIZE_V, CHUNK_SIZE_H];
+        Clear();
     }
 
     #region MonoBehaviour
@@ -132,5 +132,16 @@ public class Chunk : MonoBehaviour
     {
         foreach (Block block in Blocks)
             block.changed = false;
+    }
+
+    public void Clear()
+    {
+        Blocks = new Block[CHUNK_SIZE_H, CHUNK_SIZE_V, CHUNK_SIZE_H];
+        rendered = false;
+        UpdateNeeded = false;
+        if(!Object.ReferenceEquals(Collider, null))
+            Collider.sharedMesh = null;
+        if (!Object.ReferenceEquals(Filter, null))
+            Filter.mesh.Clear();
     }
 }
