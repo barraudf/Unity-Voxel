@@ -7,6 +7,7 @@ public class LoadChunks : MonoBehaviour
     public World world;
 
     public int RenderDistance = 10;
+    private int SquaredRenderDistance;
 
     private ConcurrentQueue<Vector3i> updateList;
     private ConcurrentQueue<Vector3i> buildList;
@@ -14,6 +15,7 @@ public class LoadChunks : MonoBehaviour
 
     private static Vector3i[] chunkPositions;
 
+    private int MinDeleteDistance;
 
     public LoadChunks()
     {
@@ -23,7 +25,9 @@ public class LoadChunks : MonoBehaviour
 
     void Start()
     {
+        SquaredRenderDistance = RenderDistance * RenderDistance;
         chunkPositions = CreateMapChunksForGeneration();
+        MinDeleteDistance = 2 * (RenderDistance + 1) * (RenderDistance + 1) * Chunk.CHUNK_SIZE_H * Chunk.CHUNK_SIZE_H;        
     }
 
     void FindChunksToLoad()
@@ -128,7 +132,7 @@ public class LoadChunks : MonoBehaviour
                     new Vector3(chunk.Value.Position.x, 0, chunk.Value.Position.z),
                     new Vector3(transform.position.x, 0, transform.position.z));
 
-                if (distance > (RenderDistance + 5) * Chunk.CHUNK_SIZE_H)
+                if (distance * distance > MinDeleteDistance)
                     chunksToDelete.Add(chunk.Key);
             }
 
@@ -149,7 +153,8 @@ public class LoadChunks : MonoBehaviour
         for (int x = -RenderDistance; x < RenderDistance; x++)
             for (int z = -RenderDistance; z < RenderDistance; z++)
             {
-                chunksSortedByDistance.Add(new Vector3i(x, 0, z));
+                if (x * x + z * z <= SquaredRenderDistance)
+                    chunksSortedByDistance.Add(new Vector3i(x, 0, z));
             }
 
         // sort them now, by distance
