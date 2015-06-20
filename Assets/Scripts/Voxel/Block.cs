@@ -1,11 +1,15 @@
 ﻿using UnityEngine;
 using System;
 
+using Object = System.Object;
+
 public enum Direction { North, East, South, West, Up, Down };
 
 [Serializable]
 public class Block
 {
+    protected delegate MeshData FaceData(Chunk chunk, Vector3i position, MeshData meshData);
+
     #region Fields
     [NonSerialized]
     public bool changed = true;
@@ -41,23 +45,21 @@ public class Block
     {
         meshData.useRenderDataForCol = true;
 
-        if (!chunk.GetBlock(position + Vector3i.up).IsSolid(Direction.Down))
-            meshData = FaceDataUp(chunk, position, meshData);
+        meshData = ProcessFace(FaceDataUp, chunk, position, meshData, Direction.Down, Vector3i.up);
+        meshData = ProcessFace(FaceDataDown, chunk, position, meshData, Direction.Up, Vector3i.down);
+        meshData = ProcessFace(FaceDataNorth, chunk, position, meshData, Direction.South, Vector3i.backward);
+        meshData = ProcessFace(FaceDataSouth, chunk, position, meshData, Direction.North, Vector3i.forward);
+        meshData = ProcessFace(FaceDataEast, chunk, position, meshData, Direction.West, Vector3i.right);
+        meshData = ProcessFace(FaceDataWest, chunk, position, meshData, Direction.East, Vector3i.left);
 
-        if (!chunk.GetBlock(position + Vector3i.down).IsSolid(Direction.Up))
-            meshData = FaceDataDown(chunk, position, meshData);
+        return meshData;
+    }
 
-        if (!chunk.GetBlock(position + Vector3i.backward).IsSolid(Direction.South))
-            meshData = FaceDataNorth(chunk, position, meshData);
-
-        if (!chunk.GetBlock(position + Vector3i.forward).IsSolid(Direction.North))
-            meshData = FaceDataSouth(chunk, position, meshData);
-
-        if (!chunk.GetBlock(position + Vector3i.right).IsSolid(Direction.West))
-            meshData = FaceDataEast(chunk, position, meshData);
-
-        if (!chunk.GetBlock(position + Vector3i.left).IsSolid(Direction.East))
-            meshData = FaceDataWest(chunk, position, meshData);
+    protected virtual MeshData ProcessFace(FaceData func, Chunk c, Vector3i position, MeshData meshData, Direction dir, Vector3i blockOffset)
+    {
+        Block otherBlock = c.GetBlock(position + blockOffset);
+        if (!Object.ReferenceEquals(otherBlock, null) && !otherBlock.IsSolid(dir))
+                meshData = func(c, position, meshData);
 
         return meshData;
     }
