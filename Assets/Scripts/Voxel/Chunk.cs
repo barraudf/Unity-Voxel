@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Concurrent;
+using System.Threading;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
@@ -7,141 +8,287 @@ using System.Collections;
 public class Chunk : MonoBehaviour
 {
     #region Fields
-    public const int CHUNK_SIZE_H = 16;
-    public const int CHUNK_SIZE_V = 128;
-
     public World World;
     public Vector3i Position;
-    public Block[, ,] Blocks;
+    public Block[,,] Blocks;
+    public Vector3i StartRenderingAt;
 
-    public bool UpdateNeeded = false;
-    public bool rendered;
+    public bool IsBusy = false;
+    public bool MeshBuild = false;
+    public bool MarkForDeletion = false;
+    public bool DataLoaded = false;
+    public bool Rendered = false;
 
-    private MeshFilter Filter;
-    private MeshCollider Collider;
+
+    protected MeshFilter Filter;
+    protected MeshCollider Collider;
+    protected MeshData MeshData;
+    protected Chunk MeshChild;
+    protected Chunk DataParent;
+    protected ConcurrentQueue<Vector3i> ChildCreationQueue;
+    protected bool UpdateNeeded = false;
     #endregion Fields
 
-    public Chunk()
-    {
-        Clear();
-    }
-
-    #region MonoBehaviour
-    // Use this for initialization
-	void Start ()
+    private void Awake()
     {
         Filter = gameObject.GetComponent<MeshFilter>();
         Collider = gameObject.GetComponent<MeshCollider>();
-	}
-	
-	// Update is called once per frame
-	void Update ()
+        MeshData = new MeshData();
+        ChildCreationQueue = new ConcurrentQueue<Vector3i>();
+        Clear();
+    }
+
+    private void Update()
     {
-        if (UpdateNeeded)
+        if (MarkForDeletion)
+        {
+            Deactivate();
+            return;
+        }
+
+        if (MeshBuild)
+        {
+            MeshBuild = false;
+            RenderMesh();
+            IsBusy = false;
+        }
+        else if(UpdateNeeded)
         {
             UpdateNeeded = false;
-            UpdateChunk();
+            StartMeshBuilding();
         }
-	}
-    #endregion MonoBehaviour
 
-    #region Mesh management
-    //Updates the chunk based on its contents
-    private void UpdateChunk()
-    {
-        rendered = true;
-        MeshData meshData = new MeshData();
-
-        for (int x = 0; x < CHUNK_SIZE_H; x++)
-        for (int y = 0; y < CHUNK_SIZE_V; y++)
-        for (int z = 0; z < CHUNK_SIZE_H; z++)
+        Vector3i blockPosition;
+        while (ChildCreationQueue.TryDequeue(out blockPosition))
         {
-            meshData = Blocks[x, y, z].BlockData(this, new Vector3i(x, y, z), meshData);
+            MeshChild = CreateMeshChild(blockPosition);
+            if (MeshChild != null)
+                MeshChild.StartMeshBuilding();
         }
-
-        RenderMesh(meshData);
     }
 
-    //Sends the calculated mesh information
-    //to the mesh and collision components
-    private void RenderMesh(MeshData meshData)
+    public void CreateSampleChunk()
     {
-        Filter.mesh.Clear();
-        Filter.mesh.vertices = meshData.Vertices.ToArray();
-        Filter.mesh.triangles = meshData.Triangles.ToArray();
-        Filter.mesh.colors32 = meshData.Colors.ToArray();
-        Filter.mesh.RecalculateNormals();
+        for (int x = 0; x < World.CHUNK_SIZE_H; x++)
+            for (int y = 0; y < World.CHUNK_SIZE_V; y++)
+                for (int z = 0; z < World.CHUNK_SIZE_H; z++)
+                {
+                    if(y > 32)
+                    //if( (x+y+z)%2 == 1)
+                        Blocks[x, y, z] = new BlockAir();
+                    else
+                        Blocks[x, y, z] = new BlockGrass();
+                }
+
+    }
+
+    public void StartMeshBuilding()
+    {
+        if (!IsBusy)
+        {
+            IsBusy = true;
+
+            if(World.MultithreadProcessing)
+                ThreadPool.QueueUserWorkItem(nothing => { BuildMesh(); });
+            else
+                BuildMesh();
+        }
+    }
+
+    public void BuildMesh()
+    {
+        MeshData.Clear();
+        if(MeshChild != null)
+        {
+            //World.DestroyChunk(MeshChild);
+            MeshChild.Deactivate();
+            MeshChild = null;
+        }
+        Rendered = false;
+
+        bool breakX = false;
+        bool breakY = false;
+
+        for (int x = StartRenderingAt.x; x < World.CHUNK_SIZE_H; x++)
+        {
+            for (int y = StartRenderingAt.y; y < World.CHUNK_SIZE_V; y++)
+            {
+                for (int z = StartRenderingAt.z; z < World.CHUNK_SIZE_H; z++)
+                {
+                    if (MarkForDeletion)
+                        return;
+
+                    Vector3i blockPosition = new Vector3i(x, y, z);
+
+                    if (MeshData.Vertices.Count + 24 <= System.UInt16.MaxValue)
+                    {
+                        Block[,,] blocks = GetBlocks();
+                        MeshData = blocks[x, y, z].BuildMesh(this, blockPosition, MeshData);
+                    }
+                    else
+                    {
+                        ChildCreationQueue.Enqueue(blockPosition);
+
+                        breakX = breakY = true;
+                        break;
+                    }
+                    StartRenderingAt.z = 0;
+                }
+                if (breakY)
+                    break;
+                StartRenderingAt.y = 0;
+            }
+            if (breakX)
+                break;
+            StartRenderingAt.x = 0;
+        }
+        MeshBuild = true;
+    }
+
+    private Block[,,] GetBlocks()
+    {
+        if (DataParent != null)
+            return DataParent.GetBlocks();
+        else
+            return Blocks;
+    }
+
+    private void RenderMesh()
+    {
+        if (MeshChild != null)
+            MeshChild.RenderMesh();
+
+        if (Filter.mesh == null)
+            Filter.mesh = new Mesh();
+
+        MeshData.ToMeshFilter(Filter.mesh);
 
         Collider.sharedMesh = null;
-        Mesh mesh = new Mesh();
-        mesh.vertices = meshData.ColVertices.ToArray();
-        mesh.triangles = meshData.ColTriangles.ToArray();
-        mesh.RecalculateNormals();
+        Collider.sharedMesh = MeshData.ToMeshCollider();
 
-        Collider.sharedMesh = mesh;
-    }
-    #endregion Mesh management
-
-    #region Block Management
-    public void SetBlock(Vector3i blockPosition, Block block)
-    {
-        if (InRange(blockPosition.x) && InRangeV(blockPosition.y) && InRange(blockPosition.z))
-            Blocks[blockPosition.x, blockPosition.y, blockPosition.z] = block;
-        else
-            World.SetBlock(Position + blockPosition, block);
+        Rendered = true;
     }
 
     public Block GetBlock(Vector3i blockPosition)
     {
-        if (InRange(blockPosition.x) && InRangeV(blockPosition.y) && InRange(blockPosition.z))
-            return Blocks[blockPosition.x, blockPosition.y, blockPosition.z];
+        Block block;
 
-        Block ret = World.GetBlock(Position + blockPosition);
+        if (IsLocalPosition(blockPosition))
+        {
+            block = GetBlocks()[blockPosition.x, blockPosition.y, blockPosition.z];
+        }
+        else
+        {
+            block = World.GetBlock(blockPosition + Position);
+        }
 
-        return ret;
+        return block;
     }
-    #endregion Block Management
 
-    public static bool InRange(int index)
+    protected Chunk CreateMeshChild(Vector3i startingBlock)
     {
-        if (index < 0 || index >= CHUNK_SIZE_H)
+        Chunk child = World.ActivateChunk(Position);
+        if (child != null)
+        {
+            MeshChild = child;
+            child.DataParent = this;
+            child.StartRenderingAt = startingBlock;
+        }
+
+        return child;
+    }
+
+    public void Clear()
+    {
+        Blocks = new Block[World.CHUNK_SIZE_H, World.CHUNK_SIZE_V, World.CHUNK_SIZE_H];
+        IsBusy = false;
+        MeshBuild = false;
+        Rendered = false;
+        DataLoaded = false;
+        StartRenderingAt = Vector3i.Zero;
+        DataParent = null;
+        MeshData.Clear();
+        if (Filter.mesh == null)
+            Filter.mesh.Clear();
+        Collider.sharedMesh = null;
+
+        if (MeshChild != null)
+        {
+            //World.DestroyChunk(MeshChild);
+            MeshChild.Clear();
+            MeshChild.Deactivate();
+            MeshChild = null;
+        }
+    }
+
+    public Chunk GetTopParent()
+    {
+        Chunk parent = this;
+
+        while (parent.DataParent != null)
+            parent = parent.DataParent;
+
+        return parent;
+    }
+
+    protected static bool InRangeH(int index)
+    {
+        if (index < 0 || index >= World.CHUNK_SIZE_H)
             return false;
 
         return true;
     }
 
-    public static bool InRangeV(int index)
+    protected static bool InRangeV(int index)
     {
-        if (index < 0 || index >= CHUNK_SIZE_V)
+        if (index < 0 || index >= World.CHUNK_SIZE_V)
             return false;
 
         return true;
+    }
+
+    public static bool IsLocalPosition(Vector3i position)
+    {
+        return InRangeH(position.x) && InRangeV(position.y) && InRangeH(position.z);
+    }
+
+    private void Deactivate()
+    {
+        if (MeshChild != null)
+            MeshChild.Deactivate();
+
+        gameObject.SetActive(false);
+    }
+
+    public static Vector3i GetChunkCoordinates(Vector3i blockPosition)
+    {
+        int x = Mathf.FloorToInt(blockPosition.x / (float)World.CHUNK_SIZE_H) * World.CHUNK_SIZE_H;
+        int y = Mathf.FloorToInt(blockPosition.y / (float)World.CHUNK_SIZE_V) * World.CHUNK_SIZE_V;
+        int z = Mathf.FloorToInt(blockPosition.z / (float)World.CHUNK_SIZE_H) * World.CHUNK_SIZE_H;
+
+        Vector3i retour = new Vector3i(x, y, z);
+
+        return retour;
+    }
+
+    public void Invalidate()
+    {
+        UpdateNeeded = true;
+    }
+
+    public void SetBlock(Vector3i blockPosition, Block block)
+    {
+        if (IsLocalPosition(blockPosition))
+        {
+            GetBlocks()[blockPosition.x, blockPosition.y, blockPosition.z] = block;
+            Invalidate();
+        }
+        else
+            World.SetBlock(Position + blockPosition, block);
     }
 
     public override string ToString()
     {
         return string.Format("Chunk({0},{1},{2})", Position.x, Position.y, Position.z);
-    }
-
-    public string FileName()
-    {
-        return string.Format("{0},{1},{2}.chunk", Position.x, Position.y, Position.z);
-    }
-
-    public void SetBlocksUnmodified()
-    {
-        foreach (Block block in Blocks)
-            block.changed = false;
-    }
-
-    public void Clear()
-    {
-        Blocks = new Block[CHUNK_SIZE_H, CHUNK_SIZE_V, CHUNK_SIZE_H];
-        rendered = false;
-        UpdateNeeded = false;
-        if(!Object.ReferenceEquals(Collider, null))
-            Collider.sharedMesh = null;
-        if (!Object.ReferenceEquals(Filter, null))
-            Filter.mesh.Clear();
     }
 }

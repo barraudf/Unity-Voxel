@@ -6,16 +6,16 @@ public class Modify : MonoBehaviour
     Vector2 rot;
     void Update()
     {
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.forward, out hit, 100))
-        {
-            Chunk chunk = hit.collider.GetComponent<Chunk>();
+        //RaycastHit hit;
+        //if (Physics.Raycast(transform.position, transform.forward, out hit, 100))
+        //{
+        //    Chunk chunk = hit.collider.GetComponent<Chunk>();
 
-            if (chunk != null && Input.GetMouseButtonDown(0))
-                    World.SetBlock(hit, new BlockAir());
-            else if (chunk != null && Input.GetMouseButtonDown(1))
-                    World.SetBlock(hit, new BlockGrass(), true);
-        }
+        //    if (chunk != null && Input.GetMouseButtonDown(0))
+        //            World.SetBlock(hit, new BlockAir());
+        //    else if (chunk != null && Input.GetMouseButtonDown(1))
+        //            World.SetBlock(hit, new BlockGrass(), true);
+        //}
 
         rot = new Vector2(
             rot.x + Input.GetAxis("Mouse X") * 3,
@@ -26,6 +26,6 @@ public class Modify : MonoBehaviour
 
         transform.position += transform.forward * 3 * Input.GetAxis("Vertical");
         transform.position += transform.right * 3 * Input.GetAxis("Horizontal");
-        transform.position += transform.up* 3 * Input.GetAxis("Jump");
+        transform.position += transform.up* Input.GetAxis("Jump");
     }
 }

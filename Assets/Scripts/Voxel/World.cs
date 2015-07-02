@@ -1,118 +1,105 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Threading;
+
 
 public class World : MonoBehaviour
 {
     #region Fields
-    public ObjectPooling ChunkPool;
-    public string worldName = "world";
+    public const float BLOCK_SIZE = 1f;
+    public const int CHUNK_SIZE_H = 16;
+    public const int CHUNK_SIZE_V = 64;
 
-    public Dictionary<Vector3i, Chunk> Chunks;
+    public ObjectPooling ChunkPool;
+    public bool MultithreadProcessing;
+    public Dictionary<Vector3i, Chunk> Chunks = new Dictionary<Vector3i, Chunk>();
     #endregion Fields
 
-    public World()
+    private void Start()
     {
-        Chunks = new Dictionary<Vector3i, Chunk>();
+        if (ChunkPool == null)
+            Debug.LogError("ChunkPool has not been set");
     }
 
     #region Chunk management
-    public Chunk CreateChunk(Vector3i position)
+    public Chunk CreateChunk(Vector3i blockPosition, bool markAsLoaded)
     {
-        GameObject newChunkObject = ChunkPool.NextObject();
-        if (Object.ReferenceEquals(newChunkObject, null))
+        if (ChunkPool == null)
+        {
             return null;
+        }
 
-        newChunkObject.transform.position = position.ToVector3();
+        Chunk chunk = ActivateChunk(blockPosition);
 
-        Chunk newChunk = newChunkObject.GetComponent<Chunk>();
+        chunk.DataLoaded = markAsLoaded;
 
-        newChunk.Position = position;
-        newChunk.World = this;
+        Chunks.Add(chunk.Position, chunk);
 
-        Chunks.Add(position, newChunk);
+        if (MultithreadProcessing)
+            ThreadPool.QueueUserWorkItem(c => InitializeChunk((Chunk)c), chunk);
+        else
+            InitializeChunk(chunk);
 
-        var terrainGen = new TerrainGen();
-        newChunk = terrainGen.ChunkGen(newChunk);
+        return chunk;
+    }
 
-        newChunk.SetBlocksUnmodified();
+    public Chunk ActivateChunk(Vector3i blockPosition)
+    {
+        GameObject chunkGO = ChunkPool.NextObject();
+        if (chunkGO == null)
+        {
+            return null;
+        }
 
-        Serialization.Load(newChunk);
+        chunkGO.transform.position = blockPosition;
 
-        return newChunk;
+        Chunk chunk = chunkGO.GetComponent<Chunk>();
+
+        chunk.Position = blockPosition;
+        chunk.World = this;
+        chunkGO.name = chunk.ToString();
+
+        return chunk;
+    }
+
+    public void InitializeChunk(Chunk chunk)
+    {
+        //charger les données
+        chunk.CreateSampleChunk();
     }
 
     public Chunk GetChunk(Vector3i blockPosition)
     {
-        float chunkSizeF = Chunk.CHUNK_SIZE_H;
-        float chunkSizeVF = Chunk.CHUNK_SIZE_V;
-        int x = Mathf.FloorToInt(blockPosition.x / chunkSizeF) * Chunk.CHUNK_SIZE_H;
-        int y = Mathf.FloorToInt(blockPosition.y / chunkSizeVF) * Chunk.CHUNK_SIZE_V;
-        int z = Mathf.FloorToInt(blockPosition.z / chunkSizeF) * Chunk.CHUNK_SIZE_H;
+        Vector3i chunkPosition = Chunk.GetChunkCoordinates(blockPosition);
 
-        Vector3i chunkPosition = new Vector3i(x,y,z);
- 
-        Chunk containerChunk = null;
+        Chunk chunk = null;
+        Chunks.TryGetValue(chunkPosition, out chunk);
 
-        Chunks.TryGetValue(chunkPosition, out containerChunk);
-
-        
-        return containerChunk;
+        return chunk;
     }
 
     public void DestroyChunk(Vector3i position)
     {
         Chunk chunk = null;
-        if (Chunks.TryGetValue(position, out chunk))
+        if(Chunks.TryGetValue(position, out chunk))
         {
-            Serialization.SaveChunk(chunk);
-            chunk.gameObject.SetActive(false);
+            if(MultithreadProcessing)
+                ThreadPool.QueueUserWorkItem(c => DestroyChunkThread((Chunk)c), chunk);
+            else
+                DestroyChunkThread(chunk);
+
+            Chunks.Remove(chunk.Position);
+
             chunk.Clear();
-            Chunks.Remove(position);
         }
+    }
+
+    private void DestroyChunkThread(Chunk chunk)
+    {
+        //Debug.LogWarning("Ajouter l'enregistrement dans DestoyChunkThread");
+        chunk.MarkForDeletion = true;
     }
     #endregion Chunk management
-
-    #region Block management
-    public Block GetBlock(Vector3i blockPosition)
-    {
-        Chunk containerChunk = GetChunk(blockPosition);
-
-        if (containerChunk != null)
-        {
-            Block chunkBlock = containerChunk.GetBlock(blockPosition - containerChunk.Position);
-            return chunkBlock;
-        }
-
-        return new BlockAir();
-    }
-
-    public void SetBlock(Vector3i blockPosition, Block block)
-    {
-        Chunk chunk = GetChunk(blockPosition);
-
-        if (chunk != null)
-        {
-            chunk.SetBlock(blockPosition - chunk.Position, block);
-
-            UpdateIfEqual(blockPosition.x - chunk.Position.x, 0, blockPosition + Vector3i.left);
-            UpdateIfEqual(blockPosition.x - chunk.Position.x, Chunk.CHUNK_SIZE_H - 1, blockPosition + Vector3i.right);
-            UpdateIfEqual(blockPosition.y - chunk.Position.y, 0, blockPosition + Vector3i.down);
-            UpdateIfEqual(blockPosition.y - chunk.Position.y, Chunk.CHUNK_SIZE_V - 1, blockPosition + Vector3i.up);
-            UpdateIfEqual(blockPosition.z - chunk.Position.z, 0, blockPosition + Vector3i.forward);
-            UpdateIfEqual(blockPosition.z - chunk.Position.z, Chunk.CHUNK_SIZE_H - 1, blockPosition + Vector3i.backward);
-        }
-    }
-
-    public static Vector3i GetBlockPosition(Vector3 pos)
-    {
-        Vector3i blockPos = new Vector3i(
-        Mathf.RoundToInt(pos.x),
-        Mathf.RoundToInt(pos.y),
-        Mathf.RoundToInt(pos.z)
-        );
-
-        return blockPos;
-    }
 
     public static Vector3i GetBlockPosition(RaycastHit hit, bool adjacent = false)
     {
@@ -122,12 +109,12 @@ public class World : MonoBehaviour
             MoveWithinBlock(hit.point.z, hit.normal.z, adjacent)
             );
 
-        return GetBlockPosition(pos);
+        return (Vector3i)pos;
     }
 
-    static float MoveWithinBlock(float pos, float norm, bool adjacent = false)
+    protected static float MoveWithinBlock(float pos, float norm, bool adjacent = false)
     {
-        if (pos - (int)pos == 0.5f || pos - (int)pos == -0.5f)
+        if (pos - (int)pos == BLOCK_SIZE / 2 || pos - (int)pos == -BLOCK_SIZE / 2)
         {
             if (adjacent)
                 pos += (norm / 2);
@@ -136,6 +123,27 @@ public class World : MonoBehaviour
         }
 
         return (float)pos;
+    }
+
+    public Block GetBlock(Vector3i blockPosition)
+    {
+        Chunk chunk = GetChunk(blockPosition);
+
+        if (chunk != null)
+        {
+            Vector3i localPosition = blockPosition - chunk.Position;
+            if (!Chunk.IsLocalPosition(localPosition))
+            {
+                Debug.LogError(string.Format("Error while getting block {0} on chunk {1} at position {3}, localposition {2}", blockPosition, chunk, localPosition, chunk.Position));
+                return new BlockAir();
+            }
+
+            return chunk.GetBlock(localPosition);
+        }
+        else
+        {
+            return new BlockAir();
+        }
     }
 
     public static bool SetBlock(RaycastHit hit, Block block, bool adjacent = false)
@@ -151,19 +159,22 @@ public class World : MonoBehaviour
         return true;
     }
 
-    public static Block GetBlock(RaycastHit hit, bool adjacent = false)
+    public void SetBlock(Vector3i blockPosition, Block block)
     {
-        Chunk chunk = hit.collider.GetComponent<Chunk>();
-        if (chunk == null)
-            return null;
+        Chunk chunk = GetChunk(blockPosition);
 
-        Vector3i pos = GetBlockPosition(hit, adjacent);
+        if (chunk != null)
+        {
+            chunk.SetBlock(blockPosition - chunk.Position, block);
 
-        Block block = chunk.World.GetBlock(pos);
-
-        return block;
+            UpdateIfEqual(blockPosition.x - chunk.Position.x, 0, blockPosition + Vector3i.Left);
+            UpdateIfEqual(blockPosition.x - chunk.Position.x, CHUNK_SIZE_H - 1, blockPosition + Vector3i.Right);
+            UpdateIfEqual(blockPosition.y - chunk.Position.y, 0, blockPosition + Vector3i.Down);
+            UpdateIfEqual(blockPosition.y - chunk.Position.y, CHUNK_SIZE_V - 1, blockPosition + Vector3i.Up);
+            UpdateIfEqual(blockPosition.z - chunk.Position.z, 0, blockPosition + Vector3i.Forward);
+            UpdateIfEqual(blockPosition.z - chunk.Position.z, CHUNK_SIZE_H - 1, blockPosition + Vector3i.Backward);
+        }
     }
-    #endregion Block management
 
     void UpdateIfEqual(int value1, int value2, Vector3i pos)
     {
@@ -171,7 +182,7 @@ public class World : MonoBehaviour
         {
             Chunk chunk = GetChunk(pos);
             if (chunk != null)
-                chunk.UpdateNeeded = true;
+                chunk.Invalidate();
         }
     }
 }

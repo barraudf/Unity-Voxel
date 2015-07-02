@@ -4,9 +4,8 @@ using System;
 [Serializable]
 public class BlockGrass : Block
 {
-    public BlockGrass()
-        : base()
+    static BlockGrass()
     {
-        Color = new Color32() { a = 255, r = 0, g = 255, b = 0 };
+        Colors.Add(typeof(BlockGrass), new Color32() { a = 255, r = 0, g = 255, b = 0 });
     }
 }

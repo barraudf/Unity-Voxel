@@ -6,27 +6,30 @@ public struct Vector3i
 {
     #region Fields
     [NonSerialized]
-    public static readonly Vector3i zero = new Vector3i(0, 0, 0);
+    public static readonly Vector3i Zero = new Vector3i(0, 0, 0);
     [NonSerialized]
-    public static readonly Vector3i one = new Vector3i(1, 1, 1);
+    public static readonly Vector3i One = new Vector3i(1, 1, 1);
     [NonSerialized]
-    public static readonly Vector3i unitX = new Vector3i(1, 0, 0);
+    public static readonly Vector3i UnitX = new Vector3i(1, 0, 0);
     [NonSerialized]
-    public static readonly Vector3i unitY = new Vector3i(0, 1, 0);
+    public static readonly Vector3i UnitY = new Vector3i(0, 1, 0);
     [NonSerialized]
-    public static readonly Vector3i unitZ = new Vector3i(0, 0, 1);
+    public static readonly Vector3i UnitZ = new Vector3i(0, 0, 1);
     [NonSerialized]
-    public static readonly Vector3i up = new Vector3i(0, 1, 0);
+    public static readonly Vector3i Up = new Vector3i(0, 1, 0);
     [NonSerialized]
-    public static readonly Vector3i down = new Vector3i(0, -1, 0);
+    public static readonly Vector3i Down = new Vector3i(0, -1, 0);
     [NonSerialized]
-    public static readonly Vector3i right = new Vector3i(1, 0, 0);
+    public static readonly Vector3i Right = new Vector3i(1, 0, 0);
     [NonSerialized]
-    public static readonly Vector3i left = new Vector3i(-1, 0, 0);
+    public static readonly Vector3i Left = new Vector3i(-1, 0, 0);
     [NonSerialized]
-    public static readonly Vector3i forward = new Vector3i(0, 0, -1);
+    public static readonly Vector3i Forward = new Vector3i(0, 0, -1);
     [NonSerialized]
-    public static readonly Vector3i backward = new Vector3i(0, 0, 1);
+    public static readonly Vector3i Backward = new Vector3i(0, 0, 1);
+
+    [NonSerialized]
+    public static readonly Vector3i ChunkSize = new Vector3i(World.CHUNK_SIZE_H, World.CHUNK_SIZE_V, World.CHUNK_SIZE_H);
 
     public int x;
     public int y;
@@ -52,14 +55,12 @@ public struct Vector3i
     /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
     public override bool Equals(object obj)
     {
-        if (GetHashCode() != obj.GetHashCode())
-            return false;
-
         if (!(obj is Vector3i))
             return false;
 
         var other = (Vector3i)obj;
-        return x == other.x && y == other.y && z == other.z;
+        bool ret = x == other.x && y == other.y && z == other.z;
+        return ret;
     }
 
     /// <summary>
@@ -69,10 +70,8 @@ public struct Vector3i
     /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
     public bool Equals(Vector3i other)
     {
-        if (GetHashCode() != other.GetHashCode())
-            return false;
-
-        return x == other.x && y == other.y && z == other.z;
+        bool ret =  x == other.x && y == other.y && z == other.z;
+        return ret;
     }
 
     /// <summary>
@@ -117,6 +116,29 @@ public struct Vector3i
         value1.z *= scaleFactor;
         return value1;
     }
+
+    public static Vector3 operator *(Vector3i value1, float scaleFactor)
+    {
+        Vector3 v = value1.ToVector3() * scaleFactor;
+        return v;
+    }
+
+    public static Vector3i operator *(Vector3i value1, Vector3i value2)
+    {
+        value1.x *= value2.x;
+        value1.y *= value2.y;
+        value1.z *= value2.z;
+        return value1;
+    }
+
+    public static Vector3i operator /(Vector3i value1, Vector3i value2)
+    {
+        Vector3 v2 = value2;
+        value1.x = Mathf.FloorToInt(value1.x / v2.x);
+        value1.y = Mathf.FloorToInt(value1.y / v2.y);
+        value1.z = Mathf.FloorToInt(value1.z / v2.z);
+        return value1;
+    }
     #endregion Operators
 
     public static double DistanceSquared(Vector3i value1, Vector3i value2)
@@ -136,5 +158,21 @@ public struct Vector3i
     public override string ToString()
     {
         return string.Format("Vector3i({0},{1},{2})", x, y, z);
+    }
+
+    public static implicit operator Vector3i(Vector3 v)
+    {
+        Vector3i blockPos = new Vector3i(
+            Mathf.RoundToInt(v.x),
+            Mathf.RoundToInt(v.y),
+            Mathf.RoundToInt(v.z)
+            );
+
+        return blockPos;
+    }
+
+    public static implicit operator Vector3(Vector3i pos)
+    {
+        return new Vector3(pos.x, pos.y, pos.z);
     }
 }

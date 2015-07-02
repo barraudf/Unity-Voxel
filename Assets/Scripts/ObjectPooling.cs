@@ -10,14 +10,14 @@ public class ObjectPooling : MonoBehaviour
 
     private List<GameObject> Instances;
 
-    void Start()
+    void Awake()
     {
         Instances = new List<GameObject>(PoolSize);
 
 		if (PrePopulate)
 			PrePolpulate ();
 	}
- 
+
 	public void PrePolpulate()
     {
 		for (int i = 0; i < PoolSize; i++)
@@ -26,7 +26,7 @@ public class ObjectPooling : MonoBehaviour
 			clone.SetActive(false);
 		}
 	}
- 
+
 	public GameObject NextObject()
     {
         foreach (GameObject instance in Instances)
@@ -41,9 +41,12 @@ public class ObjectPooling : MonoBehaviour
         if (CanGrow)
             return CreateInstance();
         else
+        {
+            Debug.LogError("No chunk available in pool");
             return null;
+        }
 	}
- 
+
 	private GameObject CreateInstance()
     {
         GameObject clone = GameObject.Instantiate(Prefab, Vector3.zero, Quaternion.identity) as GameObject;
