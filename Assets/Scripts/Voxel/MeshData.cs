@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class MeshData
 {
-    private static Color32 COLOR_BLACK = new Color32(0, 0, 0, 255);
+    //private static Color32 COLOR_BLACK = new Color32(0, 0, 0, 255);
 
     public List<Vector3> Vertices;
     public List<int> Triangles;
@@ -51,7 +51,8 @@ public class MeshData
     public void AddQuadColors(Color32 color)
     {
         for (int i = 0; i < 4; i++)
-            Colors.Add(Color32.Lerp(COLOR_BLACK, color, 0.5f + ((float)i /4)/2));
+            //Colors.Add(Color32.Lerp(COLOR_BLACK, color, 0.5f + ((float)i /4)/2));
+            Colors.Add(color);
     }
 
     public void AddVertex(Vector3 vertex)

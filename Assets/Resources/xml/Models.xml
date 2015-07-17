@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<items>
+	<item id="Chest1">
+		<SizePerVoxel>0.1</SizePerVoxel>
+		<VoxelFile>vox/Chest1.vox</VoxelFile>
+	</item>
+	<item id="DummyChest">
+		<SizePerVoxel>0.1</SizePerVoxel>
+		<VoxelFile>vox/DummyChest.vox</VoxelFile>
+	</item>
+	<item id="DummyFoot">
+		<SizePerVoxel>0.1</SizePerVoxel>
+		<MeshOrigin>3,3,4</MeshOrigin>
+		<VoxelFile>vox/DummyFoot.vox</VoxelFile>
+	</item>
+	<item id="DummyHand">
+		<SizePerVoxel>0.1</SizePerVoxel>
+		<VoxelFile>vox/DummyHand.vox</VoxelFile>
+	</item>
+	<item id="DummyHead">
+		<SizePerVoxel>0.1</SizePerVoxel>
+		<MeshOrigin>7,0,6</MeshOrigin>
+		<VoxelFile>vox/DummyHead.vox</VoxelFile>
+	</item>
+	<item id="DummyShoulder">
+		<SizePerVoxel>0.1</SizePerVoxel>
+		<MeshOrigin>0.0,1,3</MeshOrigin>
+		<VoxelFile>vox/DummyShoulder.vox</VoxelFile>
+	</item>
+	<item id="Foot1">
+		<SizePerVoxel>0.1</SizePerVoxel>
+		<MeshOrigin>2.5,3,4</MeshOrigin>
+		<VoxelFile>vox/Foot1.vox</VoxelFile>
+	</item>
+	<item id="Head1">
+		<SizePerVoxel>0.1</SizePerVoxel>
+		<MeshOrigin>7,0,6</MeshOrigin>
+		<VoxelFile>vox/Head1.vox</VoxelFile>
+	</item>
+	<item id="Head2">
+		<SizePerVoxel>0.05</SizePerVoxel>
+		<MeshOrigin>14,0,12</MeshOrigin>
+		<VoxelFile>vox/Head2.vox</VoxelFile>
+	</item>
+	<item id="Head3">
+		<SizePerVoxel>0.1</SizePerVoxel>
+		<MeshOrigin>7,0,6</MeshOrigin>
+		<VoxelFile>vox/Head3.vox</VoxelFile>
+	</item>
+	<item id="WoodenMace2H">
+		<SizePerVoxel>0.1</SizePerVoxel>
+		<MeshOrigin>0.0,0.0,0.0</MeshOrigin>
+		<VoxelFile>vox/WoodenMace2H.vox</VoxelFile>
+	</item>
+	<item id="WoodenShield">
+		<SizePerVoxel>0.1</SizePerVoxel>
+		<MeshOrigin>0.0,0.0,0.0</MeshOrigin>
+		<VoxelFile>vox/WoodenShield.vox</VoxelFile>
+	</item>
+	<item id="WoodenSword">
+		<SizePerVoxel>0.1</SizePerVoxel>
+		<MeshOrigin>0.0,0.0,0.0</MeshOrigin>
+		<VoxelFile>vox/WoodenSword.vox</VoxelFile>
+	</item>
+</items>

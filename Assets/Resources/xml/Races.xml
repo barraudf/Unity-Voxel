@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<items>
+	<item id="Human">
+		<PrefabName>prefabs/Biped</PrefabName>
+		<DefaultModels>
+			<Model part="Head">Head3</Model>
+			<Model part="Chest">Chest1</Model>
+			<Model part="Hand">DummyHand</Model>
+			<Model part="Foot">DummyFoot</Model>
+		</DefaultModels>
+	</item>
+</items>

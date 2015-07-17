@@ -1,0 +1,3 @@
+[submodule "Assets/Lib/MagicaVoxelUnity"]
+	path = Assets/Lib/MagicaVoxelUnity
+	url = https://github.com/barraudf/MagicaVoxelUnity.git
