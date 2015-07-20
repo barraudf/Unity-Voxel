@@ -5,6 +5,11 @@ using System.Collections;
 public class ThirdPersonController : MonoBehaviour
 {
 	public float MoveSpeed = 10f;
+	public float Gravity = 21f;
+	public float TerminalVelocity = 20f;
+	public float VerticalVelocity;
+	public Vector3 MoveVector;
+	public float JumpSpeed = 6f;
 
 	private CharacterController CharacterController;
 
@@ -13,31 +18,50 @@ public class ThirdPersonController : MonoBehaviour
 		CharacterController = GetComponent<CharacterController>();
 	}
 
-	public void Move(Vector3 moveVector)
+	public void Move()
 	{
-		SnapAlignCharacterWithCamera(moveVector);
-		ProcessMotion(moveVector);
+		SnapAlignCharacterWithCamera();
+		ProcessMotion();
 	}
 
-	private void ProcessMotion(Vector3 moveVector)
+	private void ProcessMotion()
 	{
-		moveVector = transform.TransformDirection(moveVector);
+		MoveVector = transform.TransformDirection(MoveVector);
 
-		if(moveVector.magnitude > 1)
-			moveVector = Vector3.Normalize(moveVector);
+		if (MoveVector.magnitude > 1)
+			MoveVector = Vector3.Normalize(MoveVector);
 
-		moveVector *= MoveSpeed;
+		MoveVector *= MoveSpeed;
 
-		moveVector *= Time.deltaTime;
+		MoveVector = new Vector3(MoveVector.x, VerticalVelocity, MoveVector.z);
+		ApplyGravity();
 
-		CharacterController.Move(moveVector);
+		CharacterController.Move(MoveVector * Time.deltaTime);
 	}
 
-	private void SnapAlignCharacterWithCamera(Vector3 moveVector)
+	private void SnapAlignCharacterWithCamera()
 	{
-		if(moveVector.x != 0 || moveVector.z != 0)
+		if (MoveVector.x != 0 || MoveVector.z != 0)
 		{
 			transform.rotation = Quaternion.Euler(transform.eulerAngles.x, Camera.main.transform.eulerAngles.y, transform.eulerAngles.z);
 		}
 	}
+
+	private void ApplyGravity()
+	{
+		if (MoveVector.y > -TerminalVelocity)
+			MoveVector = new Vector3(MoveVector.x, MoveVector.y - Gravity * Time.deltaTime, MoveVector.z);
+
+		if (CharacterController.isGrounded && MoveVector.y < -1)
+			MoveVector = new Vector3(MoveVector.x, -1, MoveVector.z);
+	}
+
+	public void Jump()
+	{
+		if(CharacterController.isGrounded)
+		{
+			VerticalVelocity = JumpSpeed;
+		}
+	}
+
 }

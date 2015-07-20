@@ -18,14 +18,17 @@ public class ThirdPersonUserControl : MonoBehaviour
 		if (!Camera.main)
 			return;
 
-		Vector3 moveVector = GetLocomotionInput();
+		GetLocomotionInput();
+		HandleActionInput();
 
-		ThirdPersonController.Move(moveVector);
+		ThirdPersonController.Move();
 	}
 
-	private Vector3 GetLocomotionInput()
+	private void GetLocomotionInput()
 	{
 		float deadZone = 0.1f;
+
+		ThirdPersonController.VerticalVelocity = ThirdPersonController.MoveVector.y;
 
 		float h = CrossPlatformInputManager.GetAxis("Horizontal");
 		float v = CrossPlatformInputManager.GetAxis("Vertical");
@@ -35,8 +38,17 @@ public class ThirdPersonUserControl : MonoBehaviour
 		if (h <= deadZone && h >= -deadZone)
 			h = 0f;
 
-		Vector3 moveVector = new Vector3(h, 0, v);
+		ThirdPersonController.MoveVector = new Vector3(h, 0, v);
+	}
 
-		return moveVector;
+	private void HandleActionInput()
+	{
+		if (CrossPlatformInputManager.GetButton("Jump"))
+			Jump();
+	}
+
+	private void Jump()
+	{
+		ThirdPersonController.Jump();
 	}
 }

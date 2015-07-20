@@ -629,6 +629,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MoveSpeed: 10
+  Gravity: 21
+  TerminalVelocity: 20
+  VerticalVelocity: 0
+  MoveVector: {x: 0, y: 0, z: 0}
+  JumpSpeed: 8
 --- !u!114 &11487070
 MonoBehaviour:
   m_ObjectHideFlags: 1
