@@ -20,13 +20,13 @@ public class ThirdPersonController : MonoBehaviour
 
 	public void Move()
 	{
-		SnapAlignCharacterWithCamera();
 		ProcessMotion();
+		SnapAlignCharacterWithCamera();
 	}
 
 	private void ProcessMotion()
 	{
-		MoveVector = transform.TransformDirection(MoveVector);
+		MoveVector = Camera.main.transform.TransformDirection(MoveVector);
 
 		if (MoveVector.magnitude > 1)
 			MoveVector = Vector3.Normalize(MoveVector);
@@ -43,7 +43,7 @@ public class ThirdPersonController : MonoBehaviour
 	{
 		if (MoveVector.x != 0 || MoveVector.z != 0)
 		{
-			transform.rotation = Quaternion.Euler(transform.eulerAngles.x, Camera.main.transform.eulerAngles.y, transform.eulerAngles.z);
+			transform.rotation = Quaternion.Euler(transform.eulerAngles.x, Mathf.Rad2Deg * Mathf.Atan2(MoveVector.x, MoveVector.z), transform.eulerAngles.z);
 		}
 	}
 
