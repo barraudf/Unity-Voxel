@@ -16,7 +16,10 @@ public class ThirdPersonCamera : MonoBehaviour
 	public float Y_MaxLimit = 90f;
 	public float X_Smooth = 0.05f;
 	public float Y_Smooth = 0.1f;
-
+	public float OcclusionDistanceStep = 0.5f;
+	public int MaxOcclusionChecks = 10;
+	public float AbsoluteMaxDistance = 0.25f;
+	public float DistanceResumeSmooth = 1f;
 
 	private float MouseX = 0f;
 	private float MouseY = 0f;
@@ -28,9 +31,13 @@ public class ThirdPersonCamera : MonoBehaviour
 	private float velY = 0f;
 	private float velZ = 0f;
 	private Vector3 Position = Vector3.zero;
+	private Camera Camera;
+	private float distanceSmooth = 0f;
+	private float preOccludedDistance = 0f;
 
 	private void Start()
 	{
+		Camera = GetComponent<Camera>();
 		Distance = Mathf.Clamp(Distance, DistanceMin, DistanceMax);
 		StartDistance = Distance;
 		Reset();
@@ -42,7 +49,15 @@ public class ThirdPersonCamera : MonoBehaviour
 			return;
 
 		HandlePlayerInput();
-		CalculateDesiredPosition();
+
+		int count = 0;
+		do
+		{
+			CalculateDesiredPosition();
+			count++;
+		}
+		while (CheckIfOccluded(count));
+
 		UpdatePosition();
 	}
 
@@ -52,6 +67,7 @@ public class ThirdPersonCamera : MonoBehaviour
 		MouseY = 10;
 		Distance = StartDistance;
 		DesiredDistance = Distance;
+		preOccludedDistance = Distance;
 	}
 
 	private void HandlePlayerInput()
@@ -68,12 +84,17 @@ public class ThirdPersonCamera : MonoBehaviour
 		}
 
 		if (CrossPlatformInputManager.GetAxis("Mouse ScrollWheel") < -deadZone || CrossPlatformInputManager.GetAxis("Mouse ScrollWheel") > deadZone)
+		{
 			DesiredDistance = Mathf.Clamp(Distance - CrossPlatformInputManager.GetAxis("Mouse ScrollWheel") * MouseWheelSensitivity, DistanceMin, DistanceMax);
+			preOccludedDistance = DesiredDistance;
+			distanceSmooth = DistanceSmooth;
+		}
 	}
 
 	private void CalculateDesiredPosition()
 	{
-		Distance = Mathf.SmoothDamp(Distance, DesiredDistance, ref velDistance, DistanceSmooth);
+		ResetDesiredDistance();
+		Distance = Mathf.SmoothDamp(Distance, DesiredDistance, ref velDistance, distanceSmooth);
 
 		DesiredPosition = CalculatePosition(MouseY, MouseX, Distance);
 	}
@@ -86,7 +107,90 @@ public class ThirdPersonCamera : MonoBehaviour
 		return TargetLookAt.position + rotation * direction;
 	}
 
+	private bool CheckIfOccluded(int count)
+	{
+		bool isOccluded = false;
 
+		float nearestDistance = CheckCameraPoints(TargetLookAt.position, DesiredPosition);
+
+		if (nearestDistance != -1f)
+		{
+			if(count < MaxOcclusionChecks)
+			{
+				isOccluded = true;
+				Distance -= OcclusionDistanceStep;
+
+				if (Distance < AbsoluteMaxDistance)
+					Distance = AbsoluteMaxDistance;
+			}
+			else
+			{
+				Distance = nearestDistance - Camera.nearClipPlane;
+			}
+
+			DesiredDistance = Distance;
+			distanceSmooth = DistanceResumeSmooth;
+		}
+
+		return isOccluded;
+	}
+
+	private float CheckCameraPoints(Vector3 from, Vector3 to)
+	{
+		float nearestDistance = -1f;
+
+		RaycastHit hitInfo;
+
+		ClipPlanePoints clipPlanePoints = ClipPlaneAtNear(to);
+
+		Debug.DrawLine(from, to + transform.forward * -Camera.nearClipPlane, Color.red);
+		Debug.DrawLine(from, clipPlanePoints.LowerLeft, Color.blue);
+		Debug.DrawLine(from, clipPlanePoints.LowerRight, Color.blue);
+		Debug.DrawLine(from, clipPlanePoints.UpperLeft, Color.blue);
+		Debug.DrawLine(from, clipPlanePoints.UpperRight, Color.blue);
+
+		Debug.DrawLine(clipPlanePoints.UpperLeft, clipPlanePoints.UpperRight, Color.blue);
+		Debug.DrawLine(clipPlanePoints.LowerLeft, clipPlanePoints.LowerRight, Color.blue);
+		Debug.DrawLine(clipPlanePoints.UpperRight, clipPlanePoints.LowerRight, Color.blue);
+		Debug.DrawLine(clipPlanePoints.UpperLeft, clipPlanePoints.LowerLeft, Color.blue);
+
+		if (Physics.Linecast(from, clipPlanePoints.UpperLeft, out hitInfo) && hitInfo.collider.tag != "Player")
+			nearestDistance = hitInfo.distance;
+
+		if (Physics.Linecast(from, clipPlanePoints.LowerLeft, out hitInfo) && hitInfo.collider.tag != "Player")
+			if (hitInfo.distance < nearestDistance || nearestDistance == -1f)
+				nearestDistance = hitInfo.distance;
+
+		if (Physics.Linecast(from, clipPlanePoints.UpperRight, out hitInfo) && hitInfo.collider.tag != "Player")
+			if (hitInfo.distance < nearestDistance || nearestDistance == -1f)
+				nearestDistance = hitInfo.distance;
+
+		if (Physics.Linecast(from, clipPlanePoints.LowerRight, out hitInfo) && hitInfo.collider.tag != "Player")
+			if (hitInfo.distance < nearestDistance || nearestDistance == -1f)
+				nearestDistance = hitInfo.distance;
+
+		if (Physics.Linecast(from, to + transform.forward * -Camera.nearClipPlane, out hitInfo) && hitInfo.collider.tag != "Player")
+			if (hitInfo.distance < nearestDistance || nearestDistance == -1f)
+				nearestDistance = hitInfo.distance;
+
+
+		return nearestDistance;
+	}
+
+	private void ResetDesiredDistance()
+	{
+		if(DesiredDistance < preOccludedDistance)
+		{
+			Vector3 pos = CalculatePosition(MouseY, MouseX, preOccludedDistance);
+
+			float nearestDistance = CheckCameraPoints(TargetLookAt.position, pos);
+
+			if(nearestDistance == -1f || nearestDistance > preOccludedDistance)
+			{
+				DesiredDistance = preOccludedDistance;
+			}
+		}
+	}
 
 	private void UpdatePosition()
 	{
@@ -119,5 +223,46 @@ public class ThirdPersonCamera : MonoBehaviour
 		while (angle < -180 || angle > 180);
 
 		return angle;
+	}
+
+	private static ClipPlanePoints ClipPlaneAtNear(Vector3 position)
+	{
+		ClipPlanePoints clipPlanePoints = new ClipPlanePoints();
+
+		if (!Camera.main)
+			return clipPlanePoints;
+
+		Transform transform = Camera.main.transform;
+		float halfFOV = (Camera.main.fieldOfView / 2) * Mathf.Deg2Rad;
+		float aspect = Camera.main.aspect;
+		float distance = Camera.main.nearClipPlane;
+		float height = Mathf.Tan(halfFOV) * distance;
+		float width = height * aspect;
+
+		clipPlanePoints.LowerRight = position + transform.right * width;
+		clipPlanePoints.LowerRight -= transform.up * height;
+		clipPlanePoints.LowerRight += transform.forward * distance;
+
+		clipPlanePoints.LowerLeft = position - transform.right * width;
+		clipPlanePoints.LowerLeft -= transform.up * height;
+		clipPlanePoints.LowerLeft += transform.forward * distance;
+
+		clipPlanePoints.UpperRight = position + transform.right * width;
+		clipPlanePoints.UpperRight += transform.up * height;
+		clipPlanePoints.UpperRight += transform.forward * distance;
+
+		clipPlanePoints.UpperLeft = position - transform.right * width;
+		clipPlanePoints.UpperLeft += transform.up * height;
+		clipPlanePoints.UpperLeft += transform.forward * distance;
+		
+		return clipPlanePoints;
+	}
+
+	private struct ClipPlanePoints
+	{
+		public Vector3 UpperLeft;
+		public Vector3 UpperRight;
+		public Vector3 LowerLeft;
+		public Vector3 LowerRight;
 	}
 }

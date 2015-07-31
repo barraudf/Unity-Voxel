@@ -10,9 +10,9 @@ GameObject:
   - 4: {fileID: 417330}
   - 33: {fileID: 3382524}
   - 23: {fileID: 2371934}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: RightHand
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -31,9 +31,9 @@ GameObject:
   - 143: {fileID: 14307860}
   - 114: {fileID: 11448314}
   - 114: {fileID: 11487070}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Biped
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -48,9 +48,9 @@ GameObject:
   - 4: {fileID: 461964}
   - 33: {fileID: 3347718}
   - 23: {fileID: 2369802}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: LeftHand
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -65,9 +65,9 @@ GameObject:
   - 4: {fileID: 402494}
   - 33: {fileID: 3313572}
   - 23: {fileID: 2386540}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: RightShoulder
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -80,9 +80,9 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 422690}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Body
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -97,9 +97,9 @@ GameObject:
   - 4: {fileID: 489518}
   - 33: {fileID: 3346944}
   - 23: {fileID: 2372784}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: LeftShoulder
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -114,9 +114,9 @@ GameObject:
   - 4: {fileID: 499676}
   - 33: {fileID: 3301972}
   - 23: {fileID: 2379726}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: LeftFoot
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -129,9 +129,9 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 422086}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: CameraTarget
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -146,9 +146,9 @@ GameObject:
   - 4: {fileID: 489752}
   - 33: {fileID: 3380656}
   - 23: {fileID: 2383138}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Chest
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -163,9 +163,9 @@ GameObject:
   - 4: {fileID: 406500}
   - 33: {fileID: 3382316}
   - 23: {fileID: 2359468}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Head
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -180,9 +180,9 @@ GameObject:
   - 4: {fileID: 420936}
   - 33: {fileID: 3303082}
   - 23: {fileID: 2300112}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: RightFoot
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -629,11 +629,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MoveSpeed: 10
-  Gravity: 21
+  Gravity: 30
   TerminalVelocity: 20
   VerticalVelocity: 0
   MoveVector: {x: 0, y: 0, z: 0}
-  JumpSpeed: 8
+  JumpSpeed: 12
 --- !u!114 &11487070
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -658,7 +658,7 @@ CharacterController:
   m_Height: 2.20000005
   m_Radius: .5
   m_SlopeLimit: 45
-  m_StepOffset: .300000012
+  m_StepOffset: 1
   m_SkinWidth: .0799999982
   m_MinMoveDistance: .00100000005
   m_Center: {x: 0, y: 1.16999996, z: 0}

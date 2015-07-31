@@ -45,6 +45,7 @@
 	<item id="Head3">
 		<SizePerVoxel>0.1</SizePerVoxel>
 		<MeshOrigin>7,0,6</MeshOrigin>
+		<AlphaMaskFile>vox/Head3_AM.vox</AlphaMaskFile>
 		<VoxelFile>vox/Head3.vox</VoxelFile>
 	</item>
 	<item id="WoodenMace2H">

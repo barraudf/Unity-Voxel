@@ -11,6 +11,11 @@ public class ModelData : XmlItem
 	public string VoxelFile = string.Empty;
 
 	/// <summary>
+	/// Path of the alpha mask model file.
+	/// </summary>
+	public string AlphaMaskFile = string.Empty;
+
+	/// <summary>
 	/// Size of voxel for the model (in Unity space unit)
 	/// </summary>
 	public float SizePerVoxel = 1.0f;
@@ -38,6 +43,9 @@ public class ModelData : XmlItem
 		{
 			case "VoxelFile":
 				VoxelFile = node.InnerText;
+				break;
+			case "AlphaMaskFile":
+				AlphaMaskFile = node.InnerText;
 				break;
 			case "SizePerVoxel":
 				TryParseFloat(node.InnerText, out SizePerVoxel);
@@ -68,10 +76,19 @@ public class ModelData : XmlItem
 	public Mesh[] LoadMesh()
 	{
 		Mesh[] meshes = new Mesh[] { };
-		byte[] voxData = LoadVox();
+		byte[] voxData = LoadVox(VoxelFile);
 
 		if (voxData.Length > 0)
 		{
+			MVVoxelChunk alphaChunk = null;
+			if (!string.IsNullOrEmpty(AlphaMaskFile))
+			{
+				byte[] alphaData = LoadVox(AlphaMaskFile);
+				MVMainChunk mc = MVImporter.LoadVOXFromData(alphaData, generateFaces: false);
+				if (mc != null)
+					alphaChunk = mc.voxelChunk;
+			}
+
 			MVMainChunk v = MVImporter.LoadVOXFromData(voxData);
 
 			v.palatte[0] = new Color(1f, 1f, 0.4f, 0.5f);
@@ -80,9 +97,9 @@ public class ModelData : XmlItem
 			if (v != null)
 			{
 				if (MeshOriginSet)
-					meshes = MVImporter.CreateMeshesFromChunk(v.voxelChunk, v.palatte, SizePerVoxel, MeshOrigin);
+					meshes = MVImporter.CreateMeshesFromChunk(v.voxelChunk, v.palatte, SizePerVoxel, v.alphaMaskChunk, MeshOrigin);
 				else
-					meshes = MVImporter.CreateMeshesFromChunk(v.voxelChunk, v.palatte, SizePerVoxel);
+					meshes = MVImporter.CreateMeshesFromChunk(v.voxelChunk, v.palatte, SizePerVoxel, v.alphaMaskChunk);
 			}
 		}
 
@@ -90,14 +107,15 @@ public class ModelData : XmlItem
 	}
 
 	/// <summary>
-	/// Load the data contained in <see cref="VoxelFile"/>
+	/// Load the data contained in a resource file
 	/// </summary>
+	/// <param name="resourceName">Name of the resource file to load</param>
 	/// <returns>data</returns>
-	private byte[] LoadVox()
+	private byte[] LoadVox(string resourceName)
 	{
 		byte[] data;
 
-		TextAsset asset = Resources.Load<TextAsset>(VoxelFile);
+		TextAsset asset = Resources.Load<TextAsset>(resourceName);
 		if (!asset)
 		{
 			Debug.LogErrorFormat("Unable to load Model file \"{0}\", with ModelData ID={1}", VoxelFile, ID);
