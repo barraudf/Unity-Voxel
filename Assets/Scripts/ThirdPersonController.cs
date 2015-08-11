@@ -10,12 +10,13 @@ public class ThirdPersonController : MonoBehaviour
 	public float VerticalVelocity;
 	public Vector3 MoveVector;
 	public float JumpSpeed = 6f;
+	public CharacterController CharacterController { get { return _CharacterController; } }
 
-	private CharacterController CharacterController;
+	private CharacterController _CharacterController;
 
 	private void Awake()
 	{
-		CharacterController = GetComponent<CharacterController>();
+		_CharacterController = GetComponent<CharacterController>();
 	}
 
 	public void Move()
@@ -36,7 +37,7 @@ public class ThirdPersonController : MonoBehaviour
 		MoveVector = new Vector3(MoveVector.x, VerticalVelocity, MoveVector.z);
 		ApplyGravity();
 
-		CharacterController.Move(MoveVector * Time.deltaTime);
+		_CharacterController.Move(MoveVector * Time.deltaTime);
 	}
 
 	private void SnapAlignCharacterWithCamera()
@@ -52,13 +53,13 @@ public class ThirdPersonController : MonoBehaviour
 		if (MoveVector.y > -TerminalVelocity)
 			MoveVector = new Vector3(MoveVector.x, MoveVector.y - Gravity * Time.deltaTime, MoveVector.z);
 
-		if (CharacterController.isGrounded && MoveVector.y < -1)
+		if (_CharacterController.isGrounded && MoveVector.y < -1)
 			MoveVector = new Vector3(MoveVector.x, -1, MoveVector.z);
 	}
 
 	public void Jump()
 	{
-		if(CharacterController.isGrounded)
+		if(_CharacterController.isGrounded)
 		{
 			VerticalVelocity = JumpSpeed;
 		}

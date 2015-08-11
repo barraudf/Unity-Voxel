@@ -3,15 +3,18 @@ using System.Collections;
 using UnityStandardAssets.CrossPlatformInput;
 
 [RequireComponent(typeof(ThirdPersonController))]
+[RequireComponent(typeof(ThirdPersonAnimator))]
 [RequireComponent(typeof(CharacterController))]
 public class ThirdPersonUserControl : MonoBehaviour
 {
 	private ThirdPersonController ThirdPersonController;
+	private ThirdPersonAnimator ThirdPersonAnimator;
 
 	private void Awake()
 	{
 		ThirdPersonController = GetComponent<ThirdPersonController>();
-	}
+		ThirdPersonAnimator = GetComponent<ThirdPersonAnimator>();
+    }
 
 	private void FixedUpdate()
 	{
@@ -50,5 +53,6 @@ public class ThirdPersonUserControl : MonoBehaviour
 	private void Jump()
 	{
 		ThirdPersonController.Jump();
-	}
+		ThirdPersonAnimator.Jump();
+    }
 }

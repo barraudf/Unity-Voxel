@@ -25,12 +25,13 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 407094}
-  - 95: {fileID: 9571984}
   - 65: {fileID: 6527318}
   - 114: {fileID: 11407350}
   - 143: {fileID: 14307860}
   - 114: {fileID: 11448314}
   - 114: {fileID: 11487070}
+  - 114: {fileID: 11476332}
+  - 111: {fileID: 11163892}
   m_Layer: 2
   m_Name: Biped
   m_TagString: Player
@@ -208,8 +209,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: .449999988, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 422086}
+  m_Children: []
   m_Father: {fileID: 489752}
   m_RootOrder: 0
 --- !u!4 &407094
@@ -256,11 +256,11 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 167566}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: .5, z: 0}
+  m_LocalPosition: {x: 0, y: .949999928, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 406500}
-  m_RootOrder: 0
+  m_Father: {fileID: 422690}
+  m_RootOrder: 3
 --- !u!4 &422690
 Transform:
   m_ObjectHideFlags: 1
@@ -274,6 +274,7 @@ Transform:
   - {fileID: 489752}
   - {fileID: 420936}
   - {fileID: 499676}
+  - {fileID: 422086}
   m_Father: {fileID: 407094}
   m_RootOrder: 0
 --- !u!4 &461964
@@ -367,7 +368,7 @@ MeshRenderer:
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 1
-  m_ReflectionProbeUsage: 1
+  m_ReflectionProbeUsage: 0
   m_ProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
   m_PreserveUVs: 0
@@ -589,23 +590,24 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 2.24000001, z: 1}
   m_Center: {x: 0, y: 1.13, z: 0}
---- !u!95 &9571984
-Animator:
-  serializedVersion: 3
+--- !u!111 &11163892
+Animation:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 136356}
-  m_Enabled: 0
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 07b0a45f49fb1f84fb712c0d377b043c, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 0}
+  m_Animations:
+  - {fileID: 7400000, guid: 7a78969d38bef1a47ae805fc4c76df7a, type: 2}
+  - {fileID: 7400000, guid: b0b748f1b7485fb4da3ff4327af7921f, type: 2}
+  - {fileID: 7400000, guid: ead5bae23ceb330458796a73b8397a97, type: 2}
+  - {fileID: 7400000, guid: 834a0434b5ca86e498dc8c0affb74439, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_CullingType: 0
 --- !u!114 &11407350
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -634,6 +636,19 @@ MonoBehaviour:
   VerticalVelocity: 0
   MoveVector: {x: 0, y: 0, z: 0}
   JumpSpeed: 12
+--- !u!114 &11476332
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 136356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33354ec0803f88247a252e17d618d5a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  State: 0
+  IsDead: 0
 --- !u!114 &11487070
 MonoBehaviour:
   m_ObjectHideFlags: 1

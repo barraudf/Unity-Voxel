@@ -16,7 +16,7 @@ public class MeshChanger : MonoBehaviour
 
 		if(go != null)
 		{
-			GameObject target = go.transform.Find("Body/Chest/Head/CameraTarget").gameObject;
+			GameObject target = go.transform.Find("Body/CameraTarget").gameObject;
 			Camera.main.GetComponent<ThirdPersonCamera>().TargetLookAt = target.transform;
 		}
 
