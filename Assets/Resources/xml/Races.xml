@@ -3,7 +3,7 @@
 	<item id="Human">
 		<PrefabName>prefabs/Biped</PrefabName>
 		<DefaultModels>
-			<Model part="Head">Head3</Model>
+			<Model part="Head">Head1</Model>
 			<Model part="Chest">Chest1</Model>
 			<Model part="Hand">DummyHand</Model>
 			<Model part="Foot">DummyFoot</Model>

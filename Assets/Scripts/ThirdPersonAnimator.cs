@@ -156,7 +156,7 @@ public class ThirdPersonAnimator : MonoBehaviour
 	#region Character states methods
 	private void Idling()
 	{
-		_Animation.CrossFade("Idle",0.25f);
+		_Animation.CrossFade("Idle");
 	}
 
 	private void Running()
