@@ -2,7 +2,7 @@
 using System.Collections;
 using System;
 
-public class GreedyMeshRenderer : ChunkRenderer
+public class GreedyMeshBuilder : ChunkMeshBuilder
 {
 	public override Mesh[] BuildMeshes(Chunk chunk)
 	{

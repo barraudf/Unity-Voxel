@@ -1,17 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public abstract class ChunkRenderer
+public abstract class ChunkMeshBuilder
 {
 	/// <summary>
 	/// coordinates of the pivot point (expressed in grid unit, so new Vector3(0.5f,0.5f,0.5f) would be the center of the block)
 	/// </summary>
-	public Vector3 blockOrigin;
+	public Vector3 BlockOrigin;
 
 	/// <summary>
 	/// Scale of the blocks. Default is 1, which is equal to 1 unity unit.
 	/// </summary>
-	public float blockScale;
+	public float BlockScale;
 
 	/// <summary>
 	/// Build one or more mesh from a chunk
@@ -21,4 +21,10 @@ public abstract class ChunkRenderer
 	/// <param name="blockScale">Scale of the blocks. Default is 1, which is equal to 1 unity unit.</param>
 	/// <returns></returns>
 	public abstract Mesh[] BuildMeshes(Chunk chunk);
+
+	public ChunkMeshBuilder()
+	{
+		BlockOrigin = Vector3.zero;
+		BlockScale = 1f;
+	}
 }

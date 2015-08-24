@@ -3,5 +3,5 @@ using System.Collections;
 
 public abstract class ChunkLoader
 {
-	public abstract Block[,,] LoadChunk();
+	public abstract void LoadChunk(Chunk chunk);
 }

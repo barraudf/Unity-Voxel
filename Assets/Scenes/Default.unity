@@ -96,8 +96,8 @@ GameObject:
   m_Component:
   - 4: {fileID: 777382502}
   - 33: {fileID: 777382501}
-  - 64: {fileID: 777382500}
   - 23: {fileID: 777382499}
+  - 64: {fileID: 777382500}
   - 114: {fileID: 777382498}
   m_Layer: 0
   m_Name: GameObject
@@ -114,7 +114,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 777382497}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a360a4948cd13204c8ed49e519be7f97, type: 3}
+  m_Script: {fileID: 11500000, guid: e57f6df17abafe540840b2a2fd0bffe1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!23 &777382499

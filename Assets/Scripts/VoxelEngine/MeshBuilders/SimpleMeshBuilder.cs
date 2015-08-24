@@ -2,7 +2,7 @@
 using System.Collections;
 using System;
 
-public class SimpleMeshRenderer : ChunkRenderer
+public class SimpleMeshBuilder : ChunkMeshBuilder
 {
 	private MeshBuilder meshBuilder;
 
@@ -41,7 +41,7 @@ public class SimpleMeshRenderer : ChunkRenderer
 		Block otherBlock = chunk.GetBlock(otherBlockPosition.x, otherBlockPosition.y, otherBlockPosition.z);
 
 		if (block.IsFaceVisible(direction.Opposite(), otherBlock))
-			BuildFace(blockPosition, block.GetBlockColor(), direction, chunk.MeshOrigin, blockOrigin, blockScale);
+			BuildFace(blockPosition, block.GetBlockColor(), direction, chunk.MeshOrigin, BlockOrigin, BlockScale);
 	}
 
 	private void BuildFace(GridPosition blockPosition, Color32 color, Direction direction, Vector3 chunkOrigin, Vector3 blockOrigin, float blockScale)

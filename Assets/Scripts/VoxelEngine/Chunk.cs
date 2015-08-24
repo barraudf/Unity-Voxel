@@ -107,16 +107,21 @@ public abstract class Chunk
 		return IsLocalCoordinateX(x) && IsLocalCoordinateY(y) && IsLocalCoordinateZ(z);
 	}
 
-	public virtual void BuildMeshes(ChunkRenderer builder)
+	public virtual void BuildMeshes(ChunkMeshBuilder builder)
 	{
 		Meshes = builder.BuildMeshes(this);
-		MeshDataLoaded = true;
+		MeshRendered = true;
 	}
 
-	public virtual void LoadChunk(ChunkLoader loader)
+	public virtual void Load(ChunkLoader loader)
 	{
-		Blocks = loader.LoadChunk();
+		loader.LoadChunk(this);
 		BlocksLoaded = true;
+	}
+
+	public virtual void Unload(ChunkUnloader unloader)
+	{
+		unloader.UnloadChunk(this);
 	}
 
 	public Block GetBlock(int x, int y, int z)
