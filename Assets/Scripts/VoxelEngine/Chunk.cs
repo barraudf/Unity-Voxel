@@ -34,6 +34,11 @@ public abstract class Chunk
 	/// </summary>
 	public Mesh[] Meshes;
 
+	/// <summary>
+	/// One or more GameObjects to which meshes are attached to
+	/// </summary>
+	public GameObject[] GameObjects;
+
 	public Chunk()
 	{
 		MeshOrigin = Vector3.zero;
@@ -105,23 +110,6 @@ public abstract class Chunk
 	public bool IsLocalCoordinates(int x, int y, int z)
 	{
 		return IsLocalCoordinateX(x) && IsLocalCoordinateY(y) && IsLocalCoordinateZ(z);
-	}
-
-	public virtual void BuildMeshes(ChunkMeshBuilder builder)
-	{
-		Meshes = builder.BuildMeshes(this);
-		MeshRendered = true;
-	}
-
-	public virtual void Load(ChunkLoader loader)
-	{
-		loader.LoadChunk(this);
-		BlocksLoaded = true;
-	}
-
-	public virtual void Unload(ChunkUnloader unloader)
-	{
-		unloader.UnloadChunk(this);
 	}
 
 	public Block GetBlock(int x, int y, int z)

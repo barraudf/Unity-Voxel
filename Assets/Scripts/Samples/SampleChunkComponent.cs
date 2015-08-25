@@ -1,27 +1,47 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
-[RequireComponent(typeof(MeshFilter))]
-[RequireComponent(typeof(MeshRenderer))]
-[RequireComponent(typeof(MeshCollider))]
+[RequireComponent(typeof(ObjectPool))]
 public class SampleChunkComponent : MonoBehaviour
 {
-	protected MeshFilter Filter;
-	protected MeshCollider Collider;
+	private ObjectPool pool;
+	
+	private Chunk chunk;
 
-	Chunk chunk;
+	private ChunkManager manager;
 
 	void Start()
 	{
-		Filter = GetComponent<MeshFilter>();
-		Collider = GetComponent<MeshCollider>();
+		pool = GetComponent<ObjectPool>();
 
-		ChunkManager manager = new SampleChunkManager(new SampleChunkLoader(), new SimpleUnloader(), new SimpleMeshBuilder());
+		manager = new SampleChunkManager(new SampleChunkLoader(), new SimpleUnloader(), new SimpleMeshBuilder());
 		chunk = new SampleChunk();
 		manager.Load(chunk);
 		manager.Build(chunk);
 
-		Filter.sharedMesh = chunk.Meshes[0];
-		Collider.sharedMesh = chunk.Meshes[0];
+		List<GameObject> GOs = new List<GameObject>();
+
+		for(int i = 0; i < chunk.Meshes.Length; i++)
+		{
+			GOs.Add(AttachMesh(chunk.Meshes[i]));
+		}
+
+		chunk.GameObjects = GOs.ToArray();
+	}
+
+	private GameObject AttachMesh(Mesh mesh)
+	{
+		GameObject go = pool.NextObject();
+
+		go.SetActive(true);
+
+		MeshFilter filter = go.GetComponent<MeshFilter>();
+		MeshCollider col = go.GetComponent<MeshCollider>();
+
+		filter.sharedMesh = mesh;
+		col.sharedMesh = mesh;
+
+		return go;
 	}
 }

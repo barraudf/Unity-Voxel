@@ -16,16 +16,25 @@ public abstract class ChunkManager
 
 	public virtual void Load(Chunk chunk)
 	{
-		chunk.Load(Loader);
+		Loader.LoadChunk(chunk);
+		chunk.BlocksLoaded = true;
 	}
 
 	public virtual void Unload(Chunk chunk)
 	{
-		chunk.Unload(Unloader);
+		Unloader.UnloadChunk(chunk);
+
+		if (chunk.GameObjects == null)
+			return;
+
+		for (int i = 0; i < chunk.GameObjects.Length; i++)
+			chunk.GameObjects[i].SetActive(false);
+		chunk.GameObjects = null;
 	}
 
 	public virtual void Build(Chunk chunk)
 	{
-		chunk.BuildMeshes(MeshBuilder);
+		chunk.Meshes = MeshBuilder.BuildMeshes(chunk);
+		chunk.MeshRendered = true;
 	}
 }
