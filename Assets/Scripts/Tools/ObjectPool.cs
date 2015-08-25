@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class ObjectPooling : MonoBehaviour
+public class ObjectPool : MonoBehaviour
 {
 	public int PoolSize = 5;
 	public bool PrePopulate = false;
