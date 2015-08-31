@@ -5,7 +5,7 @@ using System;
 public class MVChunk : Chunk
 {
 	#region default_palatte
-	public static Color[] defaultPalatte = new Color[] {
+	public static Color[] DefaultPalatte = new Color[] {
 		new Color(1.000000f, 1.000000f, 1.000000f),
 		new Color(1.000000f, 1.000000f, 0.800000f),
 		new Color(1.000000f, 1.000000f, 0.600000f),
@@ -267,6 +267,7 @@ public class MVChunk : Chunk
 
 	public Color[] Palette;
 	public string Name;
+	public byte[] Version;
 
 	public void SetBlock(int x, int y, int z, MVBlock block)
 	{
