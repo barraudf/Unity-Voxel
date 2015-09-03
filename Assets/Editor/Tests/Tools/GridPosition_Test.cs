@@ -171,6 +171,6 @@ public class GridPosition_Test
 	public void OperatorImpliciteTest()
 	{
 		Assert.AreEqual((Vector3)new GridPosition(-1, 2, 3), new Vector3(-1f, 2f, 3f), "#1");
-		Assert.AreEqual((GridPosition)new Vector3(-1.5f, 2.5f, 3.5f), new GridPosition(-2, 2, 3), "#2");
+		Assert.AreEqual((GridPosition)new Vector3(-1.4f, 2.2f, 3.6f), new GridPosition(-2, 2, 3), "#2");
 	}
 }

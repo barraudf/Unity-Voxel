@@ -42,17 +42,18 @@ public abstract class Chunk
 	public Chunk()
 	{
 		MeshOrigin = Vector3.zero;
-		LoadingInProgress = false;
+		ColumnLoaded = false;
 		BlocksLoaded = false;
 		DeleteRequested = false;
 		MeshDataLoaded = false;
+		Busy = false;
 	}
 
 	#region States of the chunk
 	/// <summary>
-	/// Is the chunk currently being loaded?
+	/// Has the chunk's column been loaded?
 	/// </summary>
-	public bool LoadingInProgress;
+	public bool ColumnLoaded;
 
 	/// <summary>
 	/// Are blocks loaded into memory?
@@ -70,9 +71,14 @@ public abstract class Chunk
 	public bool MeshDataLoaded;
 
 	/// <summary>
-	/// Is the mesh sent to a MeshFilter?
+	/// Are the mesh data being loaded?
 	/// </summary>
-	public bool MeshRendered = false;
+	public bool Busy;
+
+	/// <summary>
+	/// Has a mesh building already been requested since the last build?
+	/// </summary>
+	public bool UpdatePending;
 	#endregion States of the chunk
 
 	private bool IsLocalCoordinate(int index, Direction direction)
@@ -81,7 +87,7 @@ public abstract class Chunk
 		if (index < 0)
 			isLocal = false;
 		else
-			switch(direction)
+			switch (direction)
 			{
 				case Direction.Right:
 				case Direction.Left:
@@ -105,14 +111,14 @@ public abstract class Chunk
 	private bool IsLocalCoordinateZ(int index) { return IsLocalCoordinate(index, Direction.Forward); }
 	public bool IsLocalCoordinates(GridPosition pos)
 	{
-		return IsLocalCoordinateX(pos.x) && IsLocalCoordinateY(pos.y) && IsLocalCoordinateZ(pos.z);
+		return IsLocalCoordinates(pos.x, pos.y, pos.z);
 	}
 	public bool IsLocalCoordinates(int x, int y, int z)
 	{
 		return IsLocalCoordinateX(x) && IsLocalCoordinateY(y) && IsLocalCoordinateZ(z);
 	}
 
-	public Block GetBlock(int x, int y, int z)
+	public virtual Block GetBlock(int x, int y, int z)
 	{
 		if (IsLocalCoordinates(x, y, z))
 			return Blocks[x, y, z];

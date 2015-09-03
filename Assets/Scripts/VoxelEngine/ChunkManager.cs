@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public abstract class ChunkManager
+public class ChunkManager
 {
 	public ChunkLoader Loader;
 	public ChunkMeshBuilder MeshBuilder;
@@ -34,7 +34,8 @@ public abstract class ChunkManager
 
 	public virtual void Build(Chunk chunk)
 	{
+		chunk.Busy = true;
 		chunk.Meshes = MeshBuilder.BuildMeshes(chunk);
-		chunk.MeshRendered = true;
+		chunk.MeshDataLoaded = true;
 	}
 }

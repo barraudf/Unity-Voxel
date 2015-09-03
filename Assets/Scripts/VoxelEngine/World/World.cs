@@ -1,7 +1,273 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
+using System.Threading;
 
-public class World
+[RequireComponent(typeof(ObjectPool))]
+public class World : MonoBehaviour
 {
+	#region fields
+	/// <summary>
+	/// Chunks loaded into memory, optimized for direct access by position
+	/// </summary>
+	public Dictionary<GridPosition, WorldChunk> Chunks = new Dictionary<GridPosition, WorldChunk>();
 
+	/// <summary>
+	/// Chunks loaded into memory, optimized for enumeration
+	/// </summary>
+	private List<WorldChunk> ChunkList = new List<WorldChunk>();
+
+	/// <summary>
+	/// Number of blocks in each chunks on the X axis
+	/// </summary>
+	public int ChunkSizeX = 16;
+
+	/// <summary>
+	/// Number of blocks in each chunks on the Y axis
+	/// </summary>
+	public int ChunkSizeY = 64;
+
+	/// <summary>
+	/// Number of blocks in each chunks on the Z axis
+	/// </summary>
+	public int ChunkSizeZ = 16;
+
+	/// <summary>
+	/// Size of each block (in Unity unit)
+	/// </summary>
+	public float BlockScale = 1f;
+
+	/// <summary>
+	/// Maximum number of chunk on the X axis (0 means unlimited)
+	/// </summary>
+	public int MaxChunkX = 0;
+
+	/// <summary>
+	/// Maximum number of chunk on the Y axis (0 means unlimited)
+	/// </summary>
+	public int MaxChunkY = 1;
+
+	/// <summary>
+	/// Maximum number of chunk on the Z axis (0 means unlimited)
+	/// </summary>
+	public int MaxChunkZ = 0;
+
+	/// <summary>
+	/// Origin point of the world
+	/// </summary>
+	public Vector3 WorldOrigin = Vector3.zero;
+
+	/// <summary>
+	/// Should we use multithreading for chunk operations?
+	/// </summary>
+	public bool MultiThreading = true;
+
+	private ObjectPool _Pool;
+	private ChunkManager _Manager;
+	#endregion fields
+
+	private void Awake()
+	{
+		_Pool = GetComponent<ObjectPool>();
+		_Manager = new ChunkManager(new SampleChunkLoader(), new SimpleUnloader(), new SimpleMeshBuilder());
+
+		// Ensure the prefab has required components
+		if (_Pool.Prefab.GetComponent<MeshFilter>() == null)
+			_Pool.Prefab.AddComponent<MeshFilter>();
+		if (_Pool.Prefab.GetComponent<MeshCollider>() == null)
+			_Pool.Prefab.AddComponent<MeshCollider>();
+	}
+
+	private void Update()
+	{
+		for(int i = 0; i < ChunkList.Count; i++)
+		{
+			WorldChunk chunk = ChunkList[i];
+
+			if(chunk.MeshDataLoaded)
+			{
+				chunk.MeshDataLoaded = false;
+				RenderChunk(chunk);
+				chunk.Busy = false;
+            }
+		}
+	}
+
+	#region Chunk management
+	/// <summary>
+	/// Get the chunk at the given position if it has already been loaded
+	/// </summary>
+	/// <param name="position">The position of the chunk</param>
+	/// <returns>The chunk if it is loaded or null otherwise</returns>
+	public WorldChunk GetChunk(GridPosition position)
+	{
+		if (Chunks.ContainsKey(position))
+			return Chunks[position];
+		else
+			return null;
+	}
+
+	/// <summary>
+	/// Create a chunk and load its block data
+	/// </summary>
+	/// <param name="position">The position of the chunk</param>
+	/// <returns>The created chunk</returns>
+	public WorldChunk LoadChunk(GridPosition position)
+	{
+		WorldChunk chunk = new WorldChunk(this, position);
+		Chunks.Add(position, chunk);
+		ChunkList.Add(chunk);
+
+		if (!chunk.BlocksLoaded)
+		{
+			if (MultiThreading)
+				ThreadPool.QueueUserWorkItem(c => _Manager.Load((WorldChunk)c), chunk);
+			else
+				_Manager.Load(chunk);
+		}
+
+		return chunk;
+	}
+
+	/// <summary>
+	/// Build mesh data (vertices, triangles, etc.) of the chunk
+	/// </summary>
+	/// <param name="chunk"></param>
+	public void BuildChunk(WorldChunk chunk)
+	{
+		if (MultiThreading)
+		{
+			ThreadPool.QueueUserWorkItem(ch =>
+			{
+				WorldChunk c = ch as WorldChunk;
+                if (!c.UpdatePending)
+				{
+					if (c.Busy)
+					{
+						c.UpdatePending = true;
+						while (c.Busy)
+						{
+							Thread.Sleep(0);
+						}
+						c.UpdatePending = false;
+					}
+
+					_Manager.Build(c);
+				}
+			}, chunk);
+		}
+		else
+		{
+			_Manager.Build(chunk);
+		}
+	}
+
+	/// <summary>
+	/// Attach each mesh of the chunk to a GameObject
+	/// </summary>
+	/// <param name="chunk">the chunk</param>
+	public void RenderChunk(WorldChunk chunk)
+	{
+		List<GameObject> GOs = new List<GameObject>();
+
+		for (int i = 0; i < chunk.Meshes.Length; i++)
+		{
+			GameObject go = AttachMesh(chunk.Meshes[i]);
+			go.transform.position = chunk.GetGlobalPosition();
+			go.name = chunk.ToString();
+            GOs.Add(go);
+		}
+
+		chunk.GameObjects = GOs.ToArray();
+	}
+
+	public void LoadChunkColumn(int colX, int colZ)
+	{
+		GridPosition columnPosition = new GridPosition(colX, 0, colZ);
+        for (int y = 0; y < MaxChunkY; y++)
+			for (int x = -1; x <= 1; x++)
+				for (int z = -1; z <= 1; z++)
+				{
+					// Don't process diagonals
+					if (x != 0 && y != 0)
+						continue;
+
+					GridPosition position = new GridPosition(x, y, z) + columnPosition;
+					// Check if position is inside the world
+					if (MaxChunkX != 0 && (position.x < 0 || position.x >= MaxChunkX) ||
+						MaxChunkZ != 0 && (position.z < 0 || position.z >= MaxChunkZ))
+						continue;
+
+					WorldChunk chunk = GetChunk(position);
+					if (chunk == null)
+						chunk = LoadChunk(position);
+
+					if (x == 0 && z == 0)
+						chunk.ColumnLoaded = true;
+				}
+
+		if (MultiThreading)
+			ThreadPool.QueueUserWorkItem(p => BuildChunkColumn((GridPosition)p), columnPosition);
+		else
+			BuildChunkColumn(columnPosition);
+	}
+
+	private void BuildChunkColumn(GridPosition columnPosition)
+	{
+		WorldChunk chunk;
+
+		if (MultiThreading)
+		{
+			for (int y = 0; y < MaxChunkY; y++)
+				for (int x = -1; x <= 1; x++)
+					for (int z = -1; z <= 1; z++)
+					{
+						// Don't process diagonals
+						if (x != 0 && y != 0)
+							continue;
+
+						GridPosition position = new GridPosition(x, y, z) + columnPosition;
+
+						// Check if position is inside the world
+						if (MaxChunkX != 0 && (position.x < 0 || position.x >= MaxChunkX) ||
+							MaxChunkZ != 0 && (position.z < 0 || position.z >= MaxChunkZ))
+							continue;
+
+						chunk = GetChunk(position);
+						while (!chunk.BlocksLoaded)
+							Thread.Sleep(0);
+					}
+		}
+
+		for (int y = 0; y < MaxChunkY; y++)
+		{
+			chunk = GetChunk(new GridPosition(columnPosition.x, y, columnPosition.z));
+
+			if (chunk != null)
+				BuildChunk(chunk);
+		}
+	}
+	#endregion Chunk management
+
+	/// <summary>
+	/// Get a GameObject from the pool and attach a mesh to it
+	/// </summary>
+	/// <param name="mesh">Mesh to attach</param>
+	/// <returns>The "instantiated" GameObject</returns>
+	private GameObject AttachMesh(Mesh mesh)
+	{
+		GameObject go = _Pool.NextObject();
+
+		if (go != null)
+		{
+			go.SetActive(true);
+
+			MeshFilter filter = go.GetComponent<MeshFilter>();
+			MeshCollider col = go.GetComponent<MeshCollider>();
+
+			filter.sharedMesh = mesh;
+			col.sharedMesh = mesh;
+		}
+
+		return go;
+	}
 }

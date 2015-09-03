@@ -15,7 +15,7 @@ public class SampleChunkComponent : MonoBehaviour
 	{
 		pool = GetComponent<ObjectPool>();
 
-		manager = new SampleChunkManager(new SampleChunkLoader(), new SimpleUnloader(), new SimpleMeshBuilder());
+		manager = new ChunkManager(new SampleChunkLoader(), new SimpleUnloader(), new SimpleMeshBuilder());
 		chunk = new SampleChunk();
 		manager.Load(chunk);
 		manager.Build(chunk);

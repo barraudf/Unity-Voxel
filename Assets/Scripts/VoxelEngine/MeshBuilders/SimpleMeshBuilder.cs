@@ -14,8 +14,8 @@ public class SimpleMeshBuilder : ChunkMeshBuilder
 	public override Mesh[] BuildMeshes(Chunk chunk)
 	{
 		meshBuilder = new MeshBuilder();
-
-		for(int x = 0; x < chunk.SizeX; x++)
+		
+		for (int x = 0; x < chunk.SizeX; x++)
 			for (int y = 0; y < chunk.SizeY; y++)
 				for (int z = 0; z < chunk.SizeZ; z++)
 				{

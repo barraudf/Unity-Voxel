@@ -21,7 +21,7 @@ public class SampleMVComponent : MonoBehaviour
 		ChunkMeshBuilder builder = new SimpleMeshBuilder();
 		builder.BlockScale = 0.1f;
 
-		manager = new SampleChunkManager(loader, new SimpleUnloader(), builder);
+		manager = new ChunkManager(loader, new SimpleUnloader(), builder);
 		chunk = new MVChunk();
 		manager.Load(chunk);
 		manager.Build(chunk);
