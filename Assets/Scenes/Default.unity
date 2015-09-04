@@ -212,12 +212,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27a2fde85c04d9d42a929ebfa23e236d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ChunkSizeX: 4
-  ChunkSizeY: 4
-  ChunkSizeZ: 4
+  ChunkSizeX: 2
+  ChunkSizeY: 2
+  ChunkSizeZ: 2
   BlockScale: 1
-  MaxChunkX: 2
-  MaxChunkY: 2
+  MaxChunkX: 1
+  MaxChunkY: 1
   MaxChunkZ: 2
   WorldOrigin: {x: 0, y: 0, z: 0}
   MultiThreading: 0
@@ -301,7 +301,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 907672563}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -.0164549723, y: 0, z: 0, w: .999864697}
   m_LocalPosition: {x: 0, y: 1, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []

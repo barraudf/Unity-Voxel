@@ -79,16 +79,17 @@ public class World : MonoBehaviour
 
 	private void Update()
 	{
-		for(int i = 0; i < ChunkList.Count; i++)
+		for (int i = 0; i < ChunkList.Count; i++)
 		{
 			WorldChunk chunk = ChunkList[i];
 
-			if(chunk.MeshDataLoaded)
+			if (chunk.MeshDataLoaded)
 			{
 				chunk.MeshDataLoaded = false;
 				RenderChunk(chunk);
+				chunk.MeshData = null;
 				chunk.Busy = false;
-            }
+			}
 		}
 	}
 
@@ -139,7 +140,7 @@ public class World : MonoBehaviour
 			ThreadPool.QueueUserWorkItem(ch =>
 			{
 				WorldChunk c = ch as WorldChunk;
-                if (!c.UpdatePending)
+				if (!c.UpdatePending)
 				{
 					if (c.Busy)
 					{
@@ -169,12 +170,14 @@ public class World : MonoBehaviour
 	{
 		List<GameObject> GOs = new List<GameObject>();
 
-		for (int i = 0; i < chunk.Meshes.Length; i++)
+		for (int i = 0; i < chunk.MeshData.Length; i++)
 		{
-			GameObject go = AttachMesh(chunk.Meshes[i]);
+			GameObject go = AttachMesh(chunk.MeshData[i]);
+			if (go == null)
+				break;
 			go.transform.position = chunk.GetGlobalPosition();
 			go.name = chunk.ToString();
-            GOs.Add(go);
+			GOs.Add(go);
 		}
 
 		chunk.GameObjects = GOs.ToArray();
@@ -183,7 +186,7 @@ public class World : MonoBehaviour
 	public void LoadChunkColumn(int colX, int colZ)
 	{
 		GridPosition columnPosition = new GridPosition(colX, 0, colZ);
-        for (int y = 0; y < MaxChunkY; y++)
+		for (int y = 0; y < MaxChunkY; y++)
 			for (int x = -1; x <= 1; x++)
 				for (int z = -1; z <= 1; z++)
 				{
@@ -253,7 +256,7 @@ public class World : MonoBehaviour
 	/// </summary>
 	/// <param name="mesh">Mesh to attach</param>
 	/// <returns>The "instantiated" GameObject</returns>
-	private GameObject AttachMesh(Mesh mesh)
+	private GameObject AttachMesh(MeshData meshData)
 	{
 		GameObject go = _Pool.NextObject();
 
@@ -264,8 +267,13 @@ public class World : MonoBehaviour
 			MeshFilter filter = go.GetComponent<MeshFilter>();
 			MeshCollider col = go.GetComponent<MeshCollider>();
 
+			Mesh mesh = meshData.ToMesh();
 			filter.sharedMesh = mesh;
 			col.sharedMesh = mesh;
+		}
+		else
+		{
+			Debug.LogError("Pool has no GameObject available");
 		}
 
 		return go;

@@ -4,7 +4,7 @@ using System;
 
 public class GreedyMeshBuilder : ChunkMeshBuilder
 {
-	public override Mesh[] BuildMeshes(Chunk chunk)
+	public override MeshData[] BuildMeshes(Chunk chunk)
 	{
 		throw new NotImplementedException();
 	}

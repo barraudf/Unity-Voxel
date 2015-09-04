@@ -7,19 +7,17 @@ public class SampleWorldLoader : MonoBehaviour
 {
 	private World _World;
 
-	private void Awake ()
+	private void Awake()
 	{
 		_World = GetComponent<World>();
-    }
+	}
 
 	private void Start()
 	{
 		for (int x = 0; x < _World.MaxChunkX; x++)
-				for (int z = 0; z < _World.MaxChunkZ; z++)
-				{
-					_World.LoadChunkColumn(x,z);
-                }
+			for (int z = 0; z < _World.MaxChunkZ; z++)
+			{
+				_World.LoadChunkColumn(x, z);
+			}
 	}
-
-	
 }

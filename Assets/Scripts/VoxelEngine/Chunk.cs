@@ -32,7 +32,7 @@ public abstract class Chunk
 	/// <summary>
 	/// One or more mesh to hold the chunk model
 	/// </summary>
-	public Mesh[] Meshes;
+	public MeshData[] MeshData;
 
 	/// <summary>
 	/// One or more GameObjects to which meshes are attached to

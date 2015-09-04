@@ -4,16 +4,14 @@ using System;
 
 public class SimpleMeshBuilder : ChunkMeshBuilder
 {
-	private MeshBuilder meshBuilder;
-
 	/// <summary>
 	/// Build one or more mesh from a chunk
 	/// </summary>
 	/// <param name="chunk">chunk containing the blocks to render</param>
 	/// <returns></returns>
-	public override Mesh[] BuildMeshes(Chunk chunk)
+	public override MeshData[] BuildMeshes(Chunk chunk)
 	{
-		meshBuilder = new MeshBuilder();
+		MeshBuilder meshBuilder = new MeshBuilder();
 		
 		for (int x = 0; x < chunk.SizeX; x++)
 			for (int y = 0; y < chunk.SizeY; y++)
@@ -23,28 +21,28 @@ public class SimpleMeshBuilder : ChunkMeshBuilder
 					if (block != null)
 					{
 						GridPosition blockPosition = new GridPosition(x, y, z);
-                        ProcessFace(block, blockPosition, Direction.Up, chunk);
-						ProcessFace(block, blockPosition, Direction.Down, chunk);
-						ProcessFace(block, blockPosition, Direction.Right, chunk);
-						ProcessFace(block, blockPosition, Direction.Left, chunk);
-						ProcessFace(block, blockPosition, Direction.Forward, chunk);
-						ProcessFace(block, blockPosition, Direction.Backward, chunk);
+                        ProcessFace(block, blockPosition, Direction.Up,			chunk, meshBuilder);
+						ProcessFace(block, blockPosition, Direction.Down,		chunk, meshBuilder);
+						ProcessFace(block, blockPosition, Direction.Right,		chunk, meshBuilder);
+						ProcessFace(block, blockPosition, Direction.Left,		chunk, meshBuilder);
+						ProcessFace(block, blockPosition, Direction.Forward,	chunk, meshBuilder);
+						ProcessFace(block, blockPosition, Direction.Backward,	chunk, meshBuilder);
 					}
 				}
 
 		return meshBuilder.BuildMesh();
 	}
 
-	private	void ProcessFace(Block block, GridPosition blockPosition, Direction direction, Chunk chunk)
+	private	void ProcessFace(Block block, GridPosition blockPosition, Direction direction, Chunk chunk, MeshBuilder meshBuilder)
 	{
 		GridPosition otherBlockPosition = blockPosition + direction.ToUnitVector();
 		Block otherBlock = chunk.GetBlock(otherBlockPosition.x, otherBlockPosition.y, otherBlockPosition.z);
 
 		if (block.IsFaceVisible(direction.Opposite(), otherBlock))
-			BuildFace(blockPosition, block.GetBlockColor(), direction, chunk.MeshOrigin, BlockOrigin, BlockScale);
+			BuildFace(blockPosition, block.GetBlockColor(), direction, chunk.MeshOrigin, BlockOrigin, BlockScale, meshBuilder);
 	}
 
-	private void BuildFace(GridPosition blockPosition, Color32 color, Direction direction, Vector3 chunkOrigin, Vector3 blockOrigin, float blockScale)
+	private void BuildFace(GridPosition blockPosition, Color32 color, Direction direction, Vector3 chunkOrigin, Vector3 blockOrigin, float blockScale, MeshBuilder meshBuilder)
 	{
 		Vector3[] vertices = new Vector3[4];
 
@@ -98,10 +96,10 @@ public class SimpleMeshBuilder : ChunkMeshBuilder
 				vertices[3] = new Vector3(px + blockScale,	py,					pz + blockScale);	// 6
 				break;
 			case Direction.Backward:
-				vertices[0] = new Vector3(px,				py + blockScale,	pz); // 3
-				vertices[1] = new Vector3(px + blockScale,	py + blockScale,	pz); // 7
-				vertices[2] = new Vector3(px + blockScale,	py,					pz); // 5
-				vertices[3] = new Vector3(px,				py,					pz); // 1
+				vertices[0] = new Vector3(px,				py + blockScale,	pz);				// 3
+				vertices[1] = new Vector3(px + blockScale,	py + blockScale,	pz);				// 7
+				vertices[2] = new Vector3(px + blockScale,	py,					pz);				// 5
+				vertices[3] = new Vector3(px,				py,					pz);				// 1
 				break;
 		}
 

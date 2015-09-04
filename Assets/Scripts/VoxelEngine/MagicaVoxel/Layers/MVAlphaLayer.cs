@@ -21,7 +21,7 @@ public class MVAlphaLayer : MVLayer
 	public override void ReadVolxel(MVChunk chunk, int x, int y, int z, byte index)
 	{
 		if (chunk.Blocks[x, y, z] == null)
-			chunk.Blocks[x, y, z] = new MVBlock(chunk);
+			return;
 
 		((MVBlock)chunk.Blocks[x, y, z]).Alpha = index;
 	}

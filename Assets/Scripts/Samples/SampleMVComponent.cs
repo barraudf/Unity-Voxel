@@ -28,15 +28,15 @@ public class SampleMVComponent : MonoBehaviour
 
 		List<GameObject> GOs = new List<GameObject>();
 
-		for (int i = 0; i < chunk.Meshes.Length; i++)
+		for (int i = 0; i < chunk.MeshData.Length; i++)
 		{
-			GOs.Add(AttachMesh(chunk.Meshes[i]));
+			GOs.Add(AttachMesh(chunk.MeshData[i]));
 		}
 
 		chunk.GameObjects = GOs.ToArray();
 	}
 
-	private GameObject AttachMesh(Mesh mesh)
+	private GameObject AttachMesh(MeshData meshData)
 	{
 		GameObject go = pool.NextObject();
 
@@ -45,6 +45,7 @@ public class SampleMVComponent : MonoBehaviour
 		MeshFilter filter = go.GetComponent<MeshFilter>();
 		MeshCollider col = go.GetComponent<MeshCollider>();
 
+		Mesh mesh = meshData.ToMesh();
 		filter.sharedMesh = mesh;
 		col.sharedMesh = mesh;
 

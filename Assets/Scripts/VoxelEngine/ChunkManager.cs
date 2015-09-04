@@ -35,7 +35,7 @@ public class ChunkManager
 	public virtual void Build(Chunk chunk)
 	{
 		chunk.Busy = true;
-		chunk.Meshes = MeshBuilder.BuildMeshes(chunk);
+		chunk.MeshData = MeshBuilder.BuildMeshes(chunk);
 		chunk.MeshDataLoaded = true;
 	}
 }

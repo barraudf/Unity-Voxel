@@ -159,13 +159,7 @@ public struct GridPosition
 
 	public static implicit operator GridPosition(Vector3 v)
 	{
-		GridPosition vector3i = new GridPosition(
-			v.x >= 0 ? (int)v.x : (int)v.x - 1,
-			v.y >= 0 ? (int)v.y : (int)v.y - 1,
-			v.z >= 0 ? (int)v.z : (int)v.z - 1
-			);
-
-		return vector3i;
+		return new GridPosition((int)v.x, (int)v.y, (int)v.z);
 	}
 
 	public static implicit operator Vector3(GridPosition pos)

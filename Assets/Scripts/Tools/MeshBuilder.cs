@@ -12,7 +12,7 @@ public class MeshBuilder
 	private List<Vector3> _Vertices;
 	private List<int> _Triangles;
 	private List<Color32> _Colors;
-	private List<Mesh> _Meshes;
+	private List<MeshData> _MeshData;
 
 	public MeshBuilder()
 	{
@@ -20,7 +20,7 @@ public class MeshBuilder
 		_Vertices = new List<Vector3>();
 		_Triangles = new List<int>();
 		_Colors = new List<Color32>();
-		_Meshes = new List<Mesh>(1);
+		_MeshData = new List<MeshData>(1);
 	}
 
 	/// <summary>
@@ -54,13 +54,8 @@ public class MeshBuilder
 	/// </summary>
 	private void FlushMeshData()
 	{
-		Mesh mesh = new Mesh();
-		mesh.vertices = _Vertices.ToArray();
-		mesh.triangles = _Triangles.ToArray();
-		mesh.colors32 = _Colors.ToArray();
-		mesh.RecalculateNormals();
-		mesh.Optimize();
-		_Meshes.Add(mesh);
+		MeshData meshData = new MeshData(_Vertices.ToArray(), _Triangles.ToArray(), _Colors.ToArray());
+		_MeshData.Add(meshData);
 		Clear();
 	}
 
@@ -78,10 +73,10 @@ public class MeshBuilder
 	/// Return one or more meshes build from the data send to the builder
 	/// </summary>
 	/// <returns></returns>
-	public Mesh[] BuildMesh()
+	public MeshData[] BuildMesh()
 	{
 		FlushMeshData();
-		return _Meshes.ToArray();
+		return _MeshData.ToArray();
     }
 
 	/// <summary>
