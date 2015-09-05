@@ -38,19 +38,10 @@ public class WorldChunk : Chunk
 	public GridPosition CalculateChunkOffset(int x, int y, int z)
 	{
 		return new GridPosition(
-			CalcultateAxisOffset(x, SizeX),
-			CalcultateAxisOffset(y, SizeY),
-			CalcultateAxisOffset(z, SizeZ)
+			Mathf.FloorToInt(x / (float)SizeX),
+			Mathf.FloorToInt(y / (float)SizeY),
+			Mathf.FloorToInt(z / (float)SizeZ)
 			);
-	}
-
-	protected int CalcultateAxisOffset(int position, int size)
-	{
-		int offset = (int)(position / size);
-		if (position < 0 && position % size != 0)
-			offset--;
-
-		return offset;
 	}
 
 	/// <summary>
