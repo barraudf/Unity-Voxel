@@ -191,7 +191,7 @@ public class World : MonoBehaviour
 				for (int z = -1; z <= 1; z++)
 				{
 					// Don't process diagonals
-					if (x != 0 && y != 0)
+					if (x != 0 && z != 0)
 						continue;
 
 					GridPosition position = new GridPosition(x, y, z) + columnPosition;
@@ -224,16 +224,10 @@ public class World : MonoBehaviour
 				for (int x = -1; x <= 1; x++)
 					for (int z = -1; z <= 1; z++)
 					{
-						// Don't process diagonals
-						if (x != 0 && y != 0)
-							continue;
-
 						GridPosition position = new GridPosition(x, y, z) + columnPosition;
 
-						// Check if position is inside the world
-						if (MaxChunkX != 0 && (position.x < 0 || position.x >= MaxChunkX) ||
-							MaxChunkZ != 0 && (position.z < 0 || position.z >= MaxChunkZ))
-							continue;
+						if (!ColumnNeeded(columnPosition, x, z))
+							continue;						
 
 						chunk = GetChunk(position);
 						while (!chunk.BlocksLoaded)
@@ -248,6 +242,20 @@ public class World : MonoBehaviour
 			if (chunk != null)
 				BuildChunk(chunk);
 		}
+	}
+
+	private bool ColumnNeeded(GridPosition columnPosition, int x, int z)
+	{
+		// Don't process diagonals
+		if (x != 0 && z != 0)
+			return false;
+
+		// Check if position is inside the world
+		if (MaxChunkX != 0 && (columnPosition.x + x < 0 || columnPosition.x + x >= MaxChunkX) ||
+			MaxChunkZ != 0 && (columnPosition.z + z < 0 || columnPosition.z + z >= MaxChunkZ))
+			return false;
+
+		return true;
 	}
 	#endregion Chunk management
 
