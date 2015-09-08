@@ -2,19 +2,23 @@
 
 public enum Direction
 {
+	/// <summary>YPos</summary>
 	Up			= 0,
-	Down		= 1,
-	Right		= 2,
-	Left		= 3,	
-	Forward		= 4,
-	Backward	= 5,
 
-	YPos		= Up,
-	YNeg		= Down,
-	XPos		= Right,
-	XNeg		= Left,
-	ZPos		= Forward,
-	ZNeg		= Backward
+	/// <summary>YNeg</summary>
+	Down		= 1,
+
+	/// <summary>XPos, East</summary>
+	Right		= 2,
+
+	/// <summary>XNeg, West</summary>
+	Left		= 3,
+
+	/// <summary>ZPos, North</summary>
+	Forward		= 4,
+
+	/// <summary>ZNeg, South</summary>
+	Backward	= 5
 }
 
 public static class DirectionExtensions
