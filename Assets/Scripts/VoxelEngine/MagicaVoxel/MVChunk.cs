@@ -279,6 +279,10 @@ public class MVChunk : Chunk
 		return null;
 	}
 
+	protected override void SetExternalBlock(int x, int y, int z, Block block)
+	{
+	}
+
 	public void LoadPalette(Texture2D tex)
 	{
 		if(tex.height != 1 || tex.width != 256)

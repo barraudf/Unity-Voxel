@@ -7,7 +7,7 @@ public abstract class Chunk
 	/// <summary>
 	/// Grid of blocks constituting the chunk
 	/// </summary>
-	public Block[,,] Blocks;
+	protected Block[,,] Blocks;
 
 	/// <summary>
 	/// Number of columns on the X axis
@@ -53,6 +53,11 @@ public abstract class Chunk
 		MeshDataLoaded = false;
 		Busy = false;
 		BlockScale = 1f;
+	}
+
+	public void InitBlocks(int sizeX, int sizeY, int sizeZ)
+	{
+		Blocks = new Block[sizeX, sizeY, sizeZ];
 	}
 
 	#region States of the chunk
@@ -124,6 +129,7 @@ public abstract class Chunk
 		return IsLocalCoordinateX(x) && IsLocalCoordinateY(y) && IsLocalCoordinateZ(z);
 	}
 
+	#region get / set blocks
 	public virtual Block GetBlock(int x, int y, int z)
 	{
 		if (IsLocalCoordinates(x, y, z))
@@ -137,5 +143,20 @@ public abstract class Chunk
 		return GetBlock(position.x, position.y, position.z);
 	}
 
+	public virtual void SetBlock(int x, int y, int z, Block block)
+	{
+		if (IsLocalCoordinates(x, y, z))
+			Blocks[x, y, z] = block;
+		else
+			SetExternalBlock(x, y, z, block);
+	}
+
+	public void SetBlock(GridPosition position, Block block)
+	{
+		SetBlock(position.x, position.y, position.z, block);
+	}
+
 	protected abstract Block GetExternalBlock(int x, int y, int z);
+	protected abstract void SetExternalBlock(int x, int y, int z, Block block);
+	#endregion get / set blocks
 }

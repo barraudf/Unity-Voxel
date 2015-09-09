@@ -28,6 +28,16 @@ public class WorldChunk : Chunk
 			return null;
 	}
 
+	protected override void SetExternalBlock(int x, int y, int z, Block block)
+	{
+		GridPosition chunkOffset = CalculateChunkOffset(x, y, z);
+		GridPosition blockRemotePosition = CalculateBlockPosition(chunkOffset, x, y, z);
+		WorldChunk chunk = World.GetChunk(Position + chunkOffset);
+
+		if (chunk != null)
+			chunk.SetBlock(blockRemotePosition, block);
+	}
+
 	/// <summary>
 	/// Calculate the chunk position (relative to the current chunk) of a block of the given local coordinates
 	/// </summary>

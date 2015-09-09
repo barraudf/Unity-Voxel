@@ -9,7 +9,7 @@ public class ChunkTest
 	public void ChunkSizeTest()
 	{
 		TestChunk chunk = new TestChunk();
-		chunk.Blocks = new Block[5, 6, 7];
+		chunk.InitBlocks(5, 6, 7);
 
 		Assert.AreEqual(5, chunk.SizeX, "#1");
 		Assert.AreEqual(6, chunk.SizeY, "#2");
@@ -20,7 +20,7 @@ public class ChunkTest
 	public void IsLocalCoordinateTest()
 	{
 		TestChunk chunk = new TestChunk();
-		chunk.Blocks = new Block[5, 6, 7];
+		chunk.InitBlocks(5, 6, 7);
 
 		Assert.IsTrue(chunk.IsLocalCoordinates(new GridPosition(4,5,6)), "#1");
 		Assert.IsFalse(chunk.IsLocalCoordinates(new GridPosition(5, 6, 7)), "#2");
@@ -32,6 +32,11 @@ public class ChunkTest
 	private class TestChunk : Chunk
 	{
 		protected override Block GetExternalBlock(int x, int y, int z)
+		{
+			throw new NotImplementedException();
+		}
+
+		protected override void SetExternalBlock(int x, int y, int z, Block block)
 		{
 			throw new NotImplementedException();
 		}

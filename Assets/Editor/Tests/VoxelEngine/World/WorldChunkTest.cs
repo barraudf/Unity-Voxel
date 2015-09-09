@@ -9,7 +9,7 @@ public class WorldChunkTest
 	public void CalculateChunkOffsetTest()
 	{
 		WorldChunk chunk = new WorldChunk(null, GridPosition.Zero);
-		chunk.Blocks = new Block[5, 6, 7];
+		chunk.InitBlocks(5, 6, 7);
 
 		GridPosition p1 = chunk.CalculateChunkOffset(-11, 18, 5);
 		GridPosition p2 = chunk.CalculateChunkOffset(5, 6, 7);
@@ -32,7 +32,7 @@ public class WorldChunkTest
 	public void CalculateBlockPositionTest()
 	{
 		WorldChunk chunk = new WorldChunk(null, GridPosition.Zero);
-		chunk.Blocks = new Block[5, 6, 7];
+		chunk.InitBlocks(5, 6, 7);
 
 		GridPosition p1 = chunk.CalculateBlockPosition(-11, 18, 5);
 		GridPosition p2 = chunk.CalculateBlockPosition(5, 6, 7);

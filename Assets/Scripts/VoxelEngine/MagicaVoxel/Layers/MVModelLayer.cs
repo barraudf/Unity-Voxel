@@ -17,15 +17,19 @@ public class MVModelLayer : MVLayer
 
 	public override void ReadSize(MVChunk chunk, int sizeX, int sizeY, int sizeZ)
 	{
-		chunk.Blocks = new Block[sizeX, sizeY, sizeZ];
+		chunk.InitBlocks(sizeX, sizeY, sizeZ);
 	}
 
 	public override void ReadVolxel(MVChunk chunk, int x, int y, int z, byte index)
 	{
-		if (chunk.Blocks[x, y, z] == null)
-			chunk.Blocks[x, y, z] = new MVBlock(chunk);
+		MVBlock block = chunk.GetBlock(x, y, z) as MVBlock;
+		if (block == null)
+		{
+			block = new MVBlock(chunk);
+			chunk.SetBlock(x, y, z, block);
+		}
 
-		((MVBlock)chunk.Blocks[x, y, z]).ColorIndex = index;
+		block.ColorIndex = index;
 	}
 
 	public override void InitPalette(MVChunk chunk)

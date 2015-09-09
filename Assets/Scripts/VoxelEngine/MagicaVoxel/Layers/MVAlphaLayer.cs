@@ -20,10 +20,9 @@ public class MVAlphaLayer : MVLayer
 
 	public override void ReadVolxel(MVChunk chunk, int x, int y, int z, byte index)
 	{
-		if (chunk.Blocks[x, y, z] == null)
-			return;
-
-		((MVBlock)chunk.Blocks[x, y, z]).Alpha = index;
+		MVBlock block = chunk.GetBlock(x, y, z) as MVBlock;
+        if (block != null)
+			block.Alpha = index;
 	}
 
 	public override void InitPalette(MVChunk chunk)

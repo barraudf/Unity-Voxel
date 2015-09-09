@@ -8,4 +8,8 @@ public class SampleChunk : Chunk
 	{
 		return null;
 	}
+
+	protected override void SetExternalBlock(int x, int y, int z, Block block)
+	{
+	}
 }

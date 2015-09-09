@@ -15,7 +15,7 @@ public class GreedyMeshBuilder : ChunkMeshBuilder
 			for (int y = 0; y < chunk.SizeY; y++)
 				for (int z = 0; z < chunk.SizeZ; z++)
 				{
-					Block block = chunk.Blocks[x, y, z];
+					Block block = chunk.GetBlock(x, y, z);
 					if (block != null)
 					{
 						GridPosition blockPosition = new GridPosition(x, y, z);

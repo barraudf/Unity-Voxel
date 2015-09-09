@@ -10,7 +10,7 @@ public class MVBlockTest
 		MVChunk chunk = new MVChunk();
 		chunk.Palette = new Color[] { Color.white, Color.blue };
 		chunk.Name = "TestChunk";
-		chunk.Blocks = new Block[3, 1, 1];
+		chunk.InitBlocks(3, 1, 1);
 		for (int x = 0; x < chunk.SizeX; x++)
 		{
 			MVBlock block = new MVBlock(chunk);
@@ -31,8 +31,8 @@ public class MVBlockTest
 			chunk.SetBlock(x, 0, 0, block);
 		}
 
-		Assert.AreEqual((Color32)Color.magenta, chunk.Blocks[0, 0, 0].GetBlockColor(), "#1");
-		Assert.AreEqual((Color32)Color.white, chunk.Blocks[1, 0, 0].GetBlockColor(), "#2");
-		Assert.AreEqual(new Color32(0,0,255,127), chunk.Blocks[2, 0, 0].GetBlockColor(), "#3");
+		Assert.AreEqual((Color32)Color.magenta, chunk.GetBlock(0, 0, 0).GetBlockColor(), "#1");
+		Assert.AreEqual((Color32)Color.white, chunk.GetBlock(1, 0, 0).GetBlockColor(), "#2");
+		Assert.AreEqual(new Color32(0,0,255,127), chunk.GetBlock(2, 0, 0).GetBlockColor(), "#3");
 	}
 }

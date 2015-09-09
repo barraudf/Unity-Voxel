@@ -10,13 +10,14 @@ public class SampleChunkLoader : ChunkLoader
 		if (wChunk == null)
 			return;
 
-		chunk.Blocks = new Block[wChunk.World.ChunkSizeX, wChunk.World.ChunkSizeY, wChunk.World.ChunkSizeZ];
+		chunk.InitBlocks(wChunk.World.ChunkSizeX, wChunk.World.ChunkSizeY, wChunk.World.ChunkSizeZ);
 		for (int x = 0; x < chunk.SizeX; x++)
 			for (int y = 0; y < chunk.SizeY; y++)
 				for (int z = 0; z < chunk.SizeZ; z++)
 				{
-					if ((x + y + z) % 2 == 0)
-						chunk.Blocks[x, y, z] = SampleBlock.Instance;
+					//if ((x + y + z) % 2 == 0)
+					//if(y < chunk.SizeY / 2)
+						chunk.SetBlock(x, y, z, SampleBlock.Instance);
 				}
 	}
 }
