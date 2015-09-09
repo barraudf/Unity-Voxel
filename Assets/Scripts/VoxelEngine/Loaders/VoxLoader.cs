@@ -98,7 +98,7 @@ public class VoxLoader : ChunkLoader
 					{
 
 						layer.InitPalette(chunk);
-						readSize += ReadPalattee(br, chunk, layer);
+						readSize += ReadPalette(br, chunk, layer);
 
 					}
 					else
@@ -158,7 +158,7 @@ public class VoxLoader : ChunkLoader
 		return chunkSize + childrenSize + 4 * 3;
 	}
 
-	private static int ReadPalattee(BinaryReader br, MVChunk chunk, MVLayer layer)
+	private static int ReadPalette(BinaryReader br, MVChunk chunk, MVLayer layer)
 	{
 		int chunkSize = br.ReadInt32();
 		int childrenSize = br.ReadInt32();
