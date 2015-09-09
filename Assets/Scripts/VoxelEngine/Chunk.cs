@@ -39,6 +39,11 @@ public abstract class Chunk
 	/// </summary>
 	public GameObject[] GameObjects;
 
+	/// <summary>
+	/// Scale of the blocks. Default is 1, which is equal to 1 unity unit.
+	/// </summary>
+	public float BlockScale;
+
 	public Chunk()
 	{
 		MeshOrigin = Vector3.zero;
@@ -47,6 +52,7 @@ public abstract class Chunk
 		DeleteRequested = false;
 		MeshDataLoaded = false;
 		Busy = false;
+		BlockScale = 1f;
 	}
 
 	#region States of the chunk

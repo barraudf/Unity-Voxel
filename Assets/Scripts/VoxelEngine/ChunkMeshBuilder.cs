@@ -9,11 +9,6 @@ public abstract class ChunkMeshBuilder
 	public Vector3 BlockOrigin;
 
 	/// <summary>
-	/// Scale of the blocks. Default is 1, which is equal to 1 unity unit.
-	/// </summary>
-	public float BlockScale;
-
-	/// <summary>
 	/// Build one or more mesh from a chunk
 	/// </summary>
 	/// <param name="chunk">chunk containing the blocks to render</param>
@@ -25,6 +20,5 @@ public abstract class ChunkMeshBuilder
 	public ChunkMeshBuilder()
 	{
 		BlockOrigin = Vector3.zero;
-		BlockScale = 1f;
 	}
 }

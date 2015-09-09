@@ -19,7 +19,6 @@ public class SampleMVComponent : MonoBehaviour
 		loader.Layers.Add(new MVModelLayer(@"Z:\Fab\Programmation\Voxel\MagicaVoxel\vox\Chest1.vox"));
 
 		ChunkMeshBuilder builder = new SimpleMeshBuilder();
-		builder.BlockScale = 0.1f;
 
 		manager = new ChunkManager(loader, new SimpleUnloader(), builder);
 		chunk = new MVChunk();
