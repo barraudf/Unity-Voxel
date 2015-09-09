@@ -278,4 +278,15 @@ public class MVChunk : Chunk
 	{
 		return null;
 	}
+
+	public void LoadPalette(Texture2D tex)
+	{
+		if(tex.height != 1 || tex.width != 256)
+		{
+			Debug.LogErrorFormat("Error loading palette from texture \"{0}\" : wrong size. Expected 1x256, actual size is {1}x{2}.", tex.name, tex.width, tex.height);
+			return;
+		}
+
+		Palette = tex.GetPixels();
+	}
 }
