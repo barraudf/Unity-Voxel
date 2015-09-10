@@ -168,6 +168,13 @@ public class World : MonoBehaviour
 	/// <param name="chunk">the chunk</param>
 	public void RenderChunk(WorldChunk chunk)
 	{
+		if(chunk.GameObjects != null && chunk.GameObjects.Length != 0)
+		{
+			for (int i = 0; i < chunk.GameObjects.Length; i++)
+				chunk.GameObjects[i].SetActive(false);
+		}
+
+
 		List<GameObject> GOs = new List<GameObject>();
 
 		for (int i = 0; i < chunk.MeshData.Length; i++)
