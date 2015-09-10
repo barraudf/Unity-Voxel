@@ -159,4 +159,22 @@ public abstract class Chunk
 	protected abstract Block GetExternalBlock(int x, int y, int z);
 	protected abstract void SetExternalBlock(int x, int y, int z, Block block);
 	#endregion get / set blocks
+
+	#region chunk operations
+	public void Merge(Chunk otherChunk, GridPosition position, Quaternion rotation, bool ConsiderEmptyBlocks = false)
+	{
+		for (int x = 0; x < otherChunk.SizeX; x++)
+			for (int y = 0; y < otherChunk.SizeY; y++)
+				for (int z = 0; z < otherChunk.SizeZ; z++)
+				{
+					Vector3 vect = new Vector3(x, y, z) - otherChunk.MeshOrigin;
+					vect = rotation * vect;
+					GridPosition blockPosition = position + new GridPosition( Mathf.RoundToInt(vect.x), Mathf.RoundToInt(vect.y), Mathf.RoundToInt(vect.z) );
+
+					Block block = otherChunk.GetBlock(x,y,z);
+					if(block != null || ConsiderEmptyBlocks)
+						SetBlock(blockPosition, block);
+				}
+    }
+	#endregion chunk operations
 }
