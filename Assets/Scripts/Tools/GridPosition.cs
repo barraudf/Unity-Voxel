@@ -154,7 +154,7 @@ public struct GridPosition
 
 	public override string ToString()
 	{
-		return string.Format("Vector3i({0},{1},{2})", x, y, z);
+		return string.Format("GridPosition({0},{1},{2})", x, y, z);
 	}
 
 	public static implicit operator GridPosition(Vector3 v)
