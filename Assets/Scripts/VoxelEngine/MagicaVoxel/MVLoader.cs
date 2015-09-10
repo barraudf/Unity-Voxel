@@ -3,11 +3,11 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 
-public class VoxLoader : ChunkLoader
+public class MVLoader : ChunkLoader
 {
 	public List<MVLayer> Layers;
 
-	public VoxLoader()
+	public MVLoader()
 	{
 		Layers = new List<MVLayer>();
 	}

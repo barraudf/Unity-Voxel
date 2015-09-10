@@ -15,7 +15,7 @@ public class SampleMVComponent : MonoBehaviour
 	{
 		pool = GetComponent<ObjectPool>();
 
-		VoxLoader loader = new VoxLoader();
+		MVLoader loader = new MVLoader();
 		loader.Layers.Add(new MVModelLayer(@"Z:\Fab\Programmation\Voxel\MagicaVoxel\vox\Chest1.vox"));
 
 		ChunkMeshBuilder builder = new SimpleMeshBuilder();
