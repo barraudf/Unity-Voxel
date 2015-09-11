@@ -57,6 +57,11 @@ public class World : MonoBehaviour
 	public Vector3 WorldOrigin = Vector3.zero;
 
 	/// <summary>
+	/// coordinates of the pivot point (expressed in grid unit, so new Vector3(0.5f,0.5f,0.5f) would be the center of the block)
+	/// </summary>
+	public Vector3 BlockOrigin = Vector3.zero;
+
+	/// <summary>
 	/// Should we use multithreading for chunk operations?
 	/// </summary>
 	public bool MultiThreading = true;
@@ -115,6 +120,7 @@ public class World : MonoBehaviour
 	public WorldChunk LoadChunk(GridPosition position)
 	{
 		WorldChunk chunk = new WorldChunk(this, position);
+		chunk.BlockOrigin = BlockOrigin;
 		Chunks.Add(position, chunk);
 		ChunkList.Add(chunk);
 

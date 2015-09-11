@@ -39,14 +39,14 @@ public class SimpleMeshBuilder : ChunkMeshBuilder
 		Block otherBlock = chunk.GetBlock(otherBlockPosition.x, otherBlockPosition.y, otherBlockPosition.z);
 
 		if (block.IsFaceVisible(direction.Opposite(), otherBlock))
-			BuildFace(blockPosition, block.GetBlockColor(), direction, chunk.MeshOrigin, meshBuilder, chunk.BlockScale);
+			BuildFace(blockPosition, block.GetBlockColor(), direction, chunk, meshBuilder, chunk.BlockScale);
 	}
 
-	private void BuildFace(GridPosition blockPosition, Color32 color, Direction direction, Vector3 chunkOrigin, MeshBuilder meshBuilder, float blockScale)
+	private void BuildFace(GridPosition blockPosition, Color32 color, Direction direction, Chunk chunk, MeshBuilder meshBuilder, float blockScale)
 	{
 		Vector3[] vertices = new Vector3[4];
 
-		Vector3 finalOrigin = ((Vector3)blockPosition - chunkOrigin - BlockOrigin) * blockScale;
+		Vector3 finalOrigin = ((Vector3)blockPosition - chunk.MeshOrigin - chunk.BlockOrigin) * blockScale;
 		float px = finalOrigin.x;
 		float py = finalOrigin.y;
 		float pz = finalOrigin.z;

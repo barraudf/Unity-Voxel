@@ -30,6 +30,11 @@ public abstract class Chunk
 	public Vector3 MeshOrigin;
 
 	/// <summary>
+	/// coordinates of the pivot point (expressed in grid unit, so new Vector3(0.5f,0.5f,0.5f) would be the center of the block)
+	/// </summary>
+	public Vector3 BlockOrigin;
+
+	/// <summary>
 	/// One or more mesh to hold the chunk model
 	/// </summary>
 	public MeshData[] MeshData;
@@ -53,6 +58,7 @@ public abstract class Chunk
 		MeshDataLoaded = false;
 		Busy = false;
 		BlockScale = 1f;
+		BlockOrigin = Vector3.zero;
 	}
 
 	public void InitBlocks(int sizeX, int sizeY, int sizeZ)
