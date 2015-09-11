@@ -41,7 +41,7 @@ public class GreedyMeshBuilder : ChunkMeshBuilder
 						if (block != null)
 						{
 							GridPosition blockPosition = new GridPosition(x, y, z);
-							Vector3 finalOrigin = ((Vector3)blockPosition - chunk.MeshOrigin - chunk.BlockOrigin) * blockScale;
+							Vector3 finalOrigin = ((Vector3)blockPosition - chunk.ChunkOrigin - chunk.BlockOrigin) * blockScale;
 							float px = finalOrigin.x;
 							float py = finalOrigin.y;
 							float pz = finalOrigin.z;

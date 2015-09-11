@@ -27,7 +27,7 @@ public abstract class Chunk
 	/// <summary>
 	/// The pivot point of the mesh
 	/// </summary>
-	public Vector3 MeshOrigin;
+	public Vector3 ChunkOrigin;
 
 	/// <summary>
 	/// coordinates of the pivot point (expressed in grid unit, so new Vector3(0.5f,0.5f,0.5f) would be the center of the block)
@@ -51,7 +51,7 @@ public abstract class Chunk
 
 	public Chunk()
 	{
-		MeshOrigin = Vector3.zero;
+		ChunkOrigin = Vector3.zero;
 		ColumnLoaded = false;
 		BlocksLoaded = false;
 		DeleteRequested = false;
@@ -173,7 +173,7 @@ public abstract class Chunk
 			for (int y = 0; y < otherChunk.SizeY; y++)
 				for (int z = 0; z < otherChunk.SizeZ; z++)
 				{
-					Vector3 vect = new Vector3(x, y, z) - otherChunk.MeshOrigin;
+					Vector3 vect = new Vector3(x, y, z) - otherChunk.ChunkOrigin;
 					vect = rotation * vect;
 					GridPosition blockPosition = position + new GridPosition( Mathf.RoundToInt(vect.x), Mathf.RoundToInt(vect.y), Mathf.RoundToInt(vect.z) );
 
