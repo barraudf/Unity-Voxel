@@ -127,6 +127,7 @@ public class World : MonoBehaviour
 		WorldChunk chunk = new WorldChunk(this, position);
 		chunk.BlockOrigin = BlockOrigin;
 		chunk.ChunkOrigin = ChunkOrigin;
+		chunk.BlockScale = BlockScale;
 		Chunks.Add(position, chunk);
 		ChunkList.Add(chunk);
 
