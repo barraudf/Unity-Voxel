@@ -79,7 +79,6 @@ public class WorldNavigator : MonoBehaviour
 		}
 		_LastI = 0;
 		_Done = true;
-		Debug.Log("Done");
 	}
 
 	private GridPosition GetChunkPositionFromRealPosition()
