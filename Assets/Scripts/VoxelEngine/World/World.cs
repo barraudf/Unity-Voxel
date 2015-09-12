@@ -71,12 +71,14 @@ public class World : MonoBehaviour
 	/// </summary>
 	public bool MultiThreading = true;
 
+	private List<WorldNavigator> _Navigators;
 	private ObjectPool _Pool;
 	private ChunkManager _Manager;
 	#endregion fields
 
 	private void Awake()
 	{
+		_Navigators = new List<WorldNavigator>();
 		_Pool = GetComponent<ObjectPool>();
 		_Manager = new ChunkManager(new SampleChunkLoader(), new SimpleUnloader(), new SimpleMeshBuilder());
 
@@ -306,4 +308,18 @@ public class World : MonoBehaviour
 
 		return go;
 	}
+
+	#region navigators
+	public void RegisterNavigator(WorldNavigator navigator)
+	{
+		if (!_Navigators.Contains(navigator))
+			_Navigators.Add(navigator);
+	}
+
+	public void UnregisterNavigator(WorldNavigator navigator)
+	{
+		if (_Navigators.Contains(navigator))
+			_Navigators.Remove(navigator);
+	}
+	#endregion navigators
 }
