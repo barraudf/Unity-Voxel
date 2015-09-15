@@ -103,9 +103,4 @@ public class WorldChunk : Chunk
 			(Position.z * World.ChunkSizeZ * World.BlockScale) - World.WorldOrigin.z
 			);
 	}
-
-	public override string ToString()
-	{
-		return "Chunk(" + Position.x + "," + Position.y + "," + Position.z + ")";
-    }
 }

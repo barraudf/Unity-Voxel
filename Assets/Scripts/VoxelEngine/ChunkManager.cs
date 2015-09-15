@@ -24,12 +24,7 @@ public class ChunkManager
 	{
 		Unloader.UnloadChunk(chunk);
 
-		if (chunk.GameObjects == null)
-			return;
-
-		for (int i = 0; i < chunk.GameObjects.Length; i++)
-			chunk.GameObjects[i].SetActive(false);
-		chunk.GameObjects = null;
+		chunk.DeleteRequested = true;
 	}
 
 	public virtual void Build(Chunk chunk)

@@ -71,16 +71,20 @@ public class World : MonoBehaviour
 	/// </summary>
 	public bool MultiThreading = true;
 
+	public int MaxUnloadPerFrame = 1;
+
 	private List<WorldNavigator> _Navigators;
 	private ObjectPool _Pool;
 	private ChunkManager _Manager;
+
+	private int _LastIndexUnloaded = 0;
 	#endregion fields
 
 	private void Awake()
 	{
 		_Navigators = new List<WorldNavigator>();
 		_Pool = GetComponent<ObjectPool>();
-		_Manager = new ChunkManager(new SampleChunkLoader(), new SimpleUnloader(), new SimpleMeshBuilder());
+		_Manager = new ChunkManager(new SampleChunkLoader(), new SimpleUnloader(), new GreedyMeshBuilder());
 
 		// Ensure the prefab has required components
 		if (_Pool.Prefab.GetComponent<MeshFilter>() == null)
@@ -91,9 +95,18 @@ public class World : MonoBehaviour
 
 	private void Update()
 	{
-		for (int i = 0; i < ChunkList.Count; i++)
+		UnloadChunksOutOfRange();
+
+        for (int i = ChunkList.Count - 1; i >= 0; i--)
 		{
 			WorldChunk chunk = ChunkList[i];
+
+			if(chunk.DeleteRequested && !chunk.Busy)
+			{
+				ChunkList.RemoveAt(i);
+				Chunks.Remove(chunk.Position);
+				continue;
+			}
 
 			if (chunk.MeshDataLoaded)
 			{
@@ -162,7 +175,7 @@ public class World : MonoBehaviour
 						c.UpdatePending = true;
 						while (c.Busy)
 						{
-							Thread.Sleep(0);
+							Thread.Sleep(1);
 						}
 						c.UpdatePending = false;
 					}
@@ -198,7 +211,6 @@ public class World : MonoBehaviour
 			if (go == null)
 				break;
 			go.transform.position = chunk.GetGlobalPosition();
-			go.name = chunk.ToString();
 			GOs.Add(go);
 		}
 
@@ -253,7 +265,7 @@ public class World : MonoBehaviour
 
 						chunk = GetChunk(position);
 						while (!chunk.BlocksLoaded)
-							Thread.Sleep(0);
+							Thread.Sleep(1);
 					}
 		}
 
@@ -278,6 +290,50 @@ public class World : MonoBehaviour
 			return false;
 
 		return true;
+	}
+
+	private void UnloadChunk(WorldChunk chunk)
+	{
+		if (chunk.GameObjects != null)
+		{
+			for (int i = 0; i < chunk.GameObjects.Length; i++)
+				chunk.GameObjects[i].SetActive(false);
+			chunk.GameObjects = null;
+		}
+
+		if (MultiThreading)
+			ThreadPool.QueueUserWorkItem(c => _Manager.Unload((Chunk)c), chunk);
+		else
+			_Manager.Unload(chunk);
+	}
+
+	private void UnloadChunksOutOfRange()
+	{
+		int cpt = 0;
+		for (int i = _LastIndexUnloaded; i < ChunkList.Count; i++)
+		{
+			_LastIndexUnloaded = i;
+
+			if (++cpt > MaxUnloadPerFrame)
+			{
+				return;
+			}
+
+			bool isInRange = false;
+			for (int j = 0; j < _Navigators.Count; j++)
+			{
+				GridPosition offset = ChunkList[i].Position - _Navigators[j].Position;
+				if (Mathf.Abs(offset.x) + Mathf.Abs(offset.z) < WorldNavigator.RenderDistance * 2f)
+				{
+					isInRange = true;
+					break;
+				}
+			}
+
+			if (!isInRange)
+				UnloadChunk(ChunkList[i]);
+		}
+		_LastIndexUnloaded = 0;
 	}
 	#endregion Chunk management
 

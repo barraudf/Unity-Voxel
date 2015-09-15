@@ -6,12 +6,12 @@ public class WorldNavigator : MonoBehaviour
 {
 	public World World;
 	public static GridPosition[] ChunkLoadOrder;
-	public static int RenderDistance = 20;
+	public static int RenderDistance = 16;
 	public int MaxLoadPerFrame = 1;
+	public GridPosition Position;
 
 	private int _LastI = 0;
 	private bool _Done = false;
-	private GridPosition _LastChunkPosition;
 
 	private void Start ()
 	{
@@ -21,9 +21,9 @@ public class WorldNavigator : MonoBehaviour
 	private void Update()
 	{
 		GridPosition currentChunkPosition = GetChunkPositionFromRealPosition();
-        if (_Done == true && !currentChunkPosition.Equals(_LastChunkPosition))
+        if (_Done == true && !currentChunkPosition.Equals(Position))
 		{
-			_LastChunkPosition = currentChunkPosition;
+			Position = currentChunkPosition;
 			_Done = false;
 		}
 
@@ -44,12 +44,9 @@ public class WorldNavigator : MonoBehaviour
 			}
 		}
 
-		// limit how far away the blocks can be to achieve a circular loading pattern
-		float maxRadius = RenderDistance * 1.55f;
-
 		//sort 2d vectors by closeness to center
 		ChunkLoadOrder = chunkLoads
-							.Where(pos => Mathf.Abs(pos.x) + Mathf.Abs(pos.z) < maxRadius)
+							.Where(pos => IsInRange(pos))
 							.OrderBy(pos => Mathf.Abs(pos.x) + Mathf.Abs(pos.z)) //smallest magnitude vectors first
 							.ThenBy(pos => Mathf.Abs(pos.x)) //make sure not to process e.g (-10,0) before (5,5)
 							.ThenBy(pos => Mathf.Abs(pos.z))
@@ -89,4 +86,9 @@ public class WorldNavigator : MonoBehaviour
 			Mathf.FloorToInt((transform.position.z / World.BlockScale + World.BlockOrigin.z + World.ChunkOrigin.z) / (float)World.ChunkSizeZ)
 			) + World.WorldOrigin;
 	}
+
+	public static bool IsInRange(GridPosition position)
+	{
+		return Mathf.Abs(position.x) + Mathf.Abs(position.z) < RenderDistance * 1.55f;
+    }
 }
