@@ -1,9 +1,22 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using SimplexNoise;
 
 public class SampleChunkLoader : ChunkLoader
 {
+	float stoneBaseHeight = 24;
+	float stoneBaseNoise = 0.05f;
+	float stoneBaseNoiseHeight = 4;
+
+	float stoneMountainHeight = 48;
+	float stoneMountainFrequency = 0.008f;
+	float stoneMinHeight = -12;
+
+	float dirtBaseHeight = 1;
+	float dirtNoise = 0.04f;
+	float dirtNoiseHeight = 3;
+
 	public override void LoadChunk(Chunk chunk)
 	{
 		WorldChunk wChunk = chunk as WorldChunk;
@@ -11,13 +24,38 @@ public class SampleChunkLoader : ChunkLoader
 			return;
 
 		chunk.InitBlocks(wChunk.World.ChunkSizeX, wChunk.World.ChunkSizeY, wChunk.World.ChunkSizeZ);
-		for (int x = 0; x < chunk.SizeX; x++)
-			for (int y = 0; y < chunk.SizeY; y++)
-				for (int z = 0; z < chunk.SizeZ; z++)
+
+		for (int x = 0; x < wChunk.SizeX; x++)
+			for (int z = 0; z < wChunk.SizeZ; z++)
+			{
+				int stoneHeight = Mathf.FloorToInt(stoneBaseHeight);
+				stoneHeight += GetNoise(wChunk.Position.x * wChunk.SizeX + x, 0, wChunk.Position.z * wChunk.SizeZ + z, stoneMountainFrequency, Mathf.FloorToInt(stoneMountainHeight));
+
+				if (stoneHeight < stoneMinHeight)
+					stoneHeight = Mathf.FloorToInt(stoneMinHeight);
+
+				stoneHeight += GetNoise(wChunk.Position.x * wChunk.SizeX + x, 0, wChunk.Position.z * wChunk.SizeZ + z, stoneBaseNoise, Mathf.FloorToInt(stoneBaseNoiseHeight));
+
+				int dirtHeight = stoneHeight + Mathf.FloorToInt(dirtBaseHeight);
+				dirtHeight += GetNoise(x, 100, z, dirtNoise, Mathf.FloorToInt(dirtNoiseHeight));
+
+
+				for (int y = 0; y < wChunk.SizeY; y++)
 				{
-					//if ((x + y + z) % 2 == 0)
-					//if(y < chunk.SizeY / 2)
+					if (y <= stoneHeight)
+					{
+						chunk.SetBlock(x, y, z, SampleBlock2.Instance);
+					}
+					else if (y <= dirtHeight)
+					{
 						chunk.SetBlock(x, y, z, SampleBlock.Instance);
+					}
 				}
+			}
+	}
+
+	public static int GetNoise(int x, int y, int z, float scale, int max)
+	{
+		return Mathf.FloorToInt((Noise.Generate(x * scale, y * scale, z * scale) + 1f) * (max / 2f));
 	}
 }

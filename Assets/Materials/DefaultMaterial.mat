@@ -7,7 +7,7 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: DefaultMaterial
-  m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
+  m_Shader: {fileID: 4800000, guid: dd7e63944cae7544bb58a2893a542aca, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 5
   m_CustomRenderQueue: -1
@@ -109,7 +109,7 @@ Material:
       data:
         first:
           name: _Glossiness
-        second: .5
+        second: .358999997
       data:
         first:
           name: _BumpScale

@@ -18,11 +18,15 @@ public class SampleMVComponent : MonoBehaviour
 		MVLoader loader = new MVLoader();
 		loader.Layers.Add(new MVModelLayer(@"Z:\Fab\Programmation\Voxel\MagicaVoxel\vox\Chest1.vox"));
 
-		ChunkMeshBuilder builder = new SimpleMeshBuilder();
+		Texture2D tex = new Texture2D(256, 1);
+		tex.LoadImage(System.IO.File.ReadAllBytes(@"Z:\Fab\Programmation\Voxel\MagicaVoxel\export\AlternatePalette.png"));
+
+		ChunkMeshBuilder builder = new GreedyMeshBuilder();
 
 		manager = new ChunkManager(loader, new SimpleUnloader(), builder);
 		chunk = new MVChunk();
 		manager.Load(chunk);
+		chunk.LoadPalette(tex);
 		manager.Build(chunk);
 
 		List<GameObject> GOs = new List<GameObject>();
