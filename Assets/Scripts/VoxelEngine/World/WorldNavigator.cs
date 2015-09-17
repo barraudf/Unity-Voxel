@@ -6,7 +6,7 @@ public class WorldNavigator : MonoBehaviour
 {
 	public World World;
 	public static GridPosition[] ChunkLoadOrder;
-	public static int RenderDistance = 16;
+	public int RenderDistance = 16;
 	public int MaxLoadPerFrame = 1;
 	public GridPosition Position;
 
@@ -33,7 +33,7 @@ public class WorldNavigator : MonoBehaviour
 		}
 	}
 
-	static WorldNavigator()
+	private void Awake()
 	{
 		var chunkLoads = new List<GridPosition>();
 		for (int x = -RenderDistance; x <= RenderDistance; x++)
@@ -87,7 +87,7 @@ public class WorldNavigator : MonoBehaviour
 			) + World.WorldOrigin;
 	}
 
-	public static bool IsInRange(GridPosition position)
+	public bool IsInRange(GridPosition position)
 	{
 		return Mathf.Abs(position.x) + Mathf.Abs(position.z) < RenderDistance * 1.55f;
     }
