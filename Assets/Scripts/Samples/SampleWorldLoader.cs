@@ -35,7 +35,8 @@ public class SampleWorldLoader : MonoBehaviour
 				{
 					return;
 				}
-				_World.LoadChunkColumn(x, z);
+				GridPosition pos = new GridPosition(x, 0, z);
+				_World.LoadChunkColumn(pos);
 			}
 			zz = 0;
 		}

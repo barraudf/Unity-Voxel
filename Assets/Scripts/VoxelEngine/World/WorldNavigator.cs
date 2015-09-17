@@ -72,7 +72,7 @@ public class WorldNavigator : MonoBehaviour
 			if (newChunk != null && newChunk.ColumnLoaded)
 				continue;
 
-			World.LoadChunkColumn(newChunkPosition.x, newChunkPosition.z);
+			World.LoadChunkColumn(newChunkPosition);
 		}
 		_LastI = 0;
 		_Done = true;

@@ -216,22 +216,16 @@ public class World : MonoBehaviour
 		chunk.GameObjects = GOs.ToArray();
 	}
 
-	public void LoadChunkColumn(int colX, int colZ)
+	public void LoadChunkColumn(GridPosition columnPosition)
 	{
-		GridPosition columnPosition = new GridPosition(colX, 0, colZ);
 		for (int y = 0; y < MaxChunkY; y++)
 			for (int x = -1; x <= 1; x++)
 				for (int z = -1; z <= 1; z++)
 				{
-					// Don't process diagonals
-					if (x != 0 && z != 0)
+					if (!ColumnNeeded(columnPosition, x, z))
 						continue;
 
 					GridPosition position = new GridPosition(x, y, z) + columnPosition;
-					// Check if position is inside the world
-					if (MaxChunkX != 0 && (position.x < 0 || position.x >= MaxChunkX) ||
-						MaxChunkZ != 0 && (position.z < 0 || position.z >= MaxChunkZ))
-						continue;
 
 					WorldChunk chunk = GetChunk(position);
 					if (chunk == null)
@@ -257,10 +251,10 @@ public class World : MonoBehaviour
 				for (int x = -1; x <= 1; x++)
 					for (int z = -1; z <= 1; z++)
 					{
-						GridPosition position = new GridPosition(x, y, z) + columnPosition;
-
 						if (!ColumnNeeded(columnPosition, x, z))
-							continue;						
+							continue;
+
+						GridPosition position = new GridPosition(x, y, z) + columnPosition;
 
 						chunk = GetChunk(position);
 						while (!chunk.BlocksLoaded)
