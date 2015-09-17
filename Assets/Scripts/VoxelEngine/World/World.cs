@@ -72,12 +72,14 @@ public class World : MonoBehaviour
 	public bool MultiThreading = true;
 
 	public int MaxUnloadPerFrame = 1;
+	public int MaxRenderPerFrame = 1;
 
 	private List<WorldNavigator> _Navigators;
 	private ObjectPool _Pool;
 	private ChunkManager _Manager;
 
 	private int _LastIndexUnloaded = 0;
+	private WorldChunk[] _UnloadingList;
 	#endregion fields
 
 	private void Awake()
@@ -97,6 +99,7 @@ public class World : MonoBehaviour
 	{
 		UnloadChunksOutOfRange();
 
+		int cpt = 0;
         for (int i = ChunkList.Count - 1; i >= 0; i--)
 		{
 			WorldChunk chunk = ChunkList[i];
@@ -108,7 +111,7 @@ public class World : MonoBehaviour
 				continue;
 			}
 
-			if (chunk.MeshDataLoaded)
+			if (chunk.MeshDataLoaded && cpt++ < MaxRenderPerFrame)
 			{
 				chunk.MeshDataLoaded = false;
 				RenderChunk(chunk);
@@ -204,12 +207,14 @@ public class World : MonoBehaviour
 
 		List<GameObject> GOs = new List<GameObject>();
 
-		for (int i = 0; i < chunk.MeshData.Length; i++)
+		Vector3 goPosition = chunk.GetGlobalPosition();
+
+        for (int i = 0; i < chunk.MeshData.Length; i++)
 		{
 			GameObject go = AttachMesh(chunk.MeshData[i]);
 			if (go == null)
 				break;
-			go.transform.position = chunk.GetGlobalPosition();
+			go.transform.position = goPosition;
 			GOs.Add(go);
 		}
 
@@ -302,8 +307,11 @@ public class World : MonoBehaviour
 
 	private void UnloadChunksOutOfRange()
 	{
+		if (_LastIndexUnloaded == 0)
+			_UnloadingList = ChunkList.ToArray();
+
 		int cpt = 0;
-		for (int i = _LastIndexUnloaded; i < ChunkList.Count; i++)
+		for (int i = _LastIndexUnloaded; i < _UnloadingList.Length; i++)
 		{
 			_LastIndexUnloaded = i;
 
@@ -315,7 +323,7 @@ public class World : MonoBehaviour
 			bool isInRange = false;
 			for (int j = 0; j < _Navigators.Count; j++)
 			{
-				GridPosition offset = ChunkList[i].Position - _Navigators[j].Position;
+				GridPosition offset = _UnloadingList[i].Position - _Navigators[j].Position;
 				if (Mathf.Abs(offset.x) + Mathf.Abs(offset.z) < _Navigators[j].RenderDistance * 2f)
 				{
 					isInRange = true;
@@ -324,10 +332,11 @@ public class World : MonoBehaviour
 			}
 
 			if (!isInRange)
-				UnloadChunk(ChunkList[i]);
+				UnloadChunk(_UnloadingList[i]);
 		}
 		_LastIndexUnloaded = 0;
-	}
+		_UnloadingList = null;
+    }
 	#endregion Chunk management
 
 	/// <summary>
