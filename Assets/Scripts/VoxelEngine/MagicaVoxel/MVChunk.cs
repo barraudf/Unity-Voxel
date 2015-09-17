@@ -269,11 +269,6 @@ public class MVChunk : Chunk
 	public string Name;
 	public byte[] Version;
 
-	public void SetBlock(int x, int y, int z, MVBlock block)
-	{
-		Blocks[x, y, z] = block;
-	}
-
 	protected override Block GetExternalBlock(int x, int y, int z)
 	{
 		return null;
