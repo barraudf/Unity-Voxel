@@ -322,7 +322,7 @@ public class World : MonoBehaviour
 			for (int j = 0; j < _Navigators.Count; j++)
 			{
 				GridPosition offset = ChunkList[i].Position - _Navigators[j].Position;
-				if (Mathf.Abs(offset.x) + Mathf.Abs(offset.z) < WorldNavigator.RenderDistance * 2f)
+				if (Mathf.Abs(offset.x) + Mathf.Abs(offset.z) < _Navigators[j].RenderDistance * 2f)
 				{
 					isInRange = true;
 					break;
