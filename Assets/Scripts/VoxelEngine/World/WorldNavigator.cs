@@ -16,6 +16,7 @@ public class WorldNavigator : MonoBehaviour
 	private void Start ()
 	{
 		World.RegisterNavigator(this);
+		Position = GetChunkPositionFromRealPosition();
 	}
 
 	private void Update()
@@ -29,7 +30,7 @@ public class WorldNavigator : MonoBehaviour
 
 		if (!_Done)
 		{
-			LoadChunksInRange(currentChunkPosition);
+			LoadChunksInRange(Position);
 		}
 	}
 
