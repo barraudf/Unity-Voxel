@@ -149,7 +149,7 @@ public class World : MonoBehaviour
 		if (!chunk.BlocksLoaded)
 		{
 			if (MultiThreading)
-				ThreadPool.QueueUserWorkItem(c => _Manager.Load((WorldChunk)c), chunk);
+				new Thread(() => { _Manager.Load(chunk); }).Start();
 			else
 				_Manager.Load(chunk);
 		}
@@ -165,24 +165,23 @@ public class World : MonoBehaviour
 	{
 		if (MultiThreading)
 		{
-			ThreadPool.QueueUserWorkItem(ch =>
+			new Thread(() =>
 			{
-				WorldChunk c = ch as WorldChunk;
-				if (!c.UpdatePending)
+				if (!chunk.UpdatePending)
 				{
-					if (c.Busy)
+					if (chunk.Busy)
 					{
-						c.UpdatePending = true;
-						while (c.Busy)
+						chunk.UpdatePending = true;
+						while (chunk.Busy)
 						{
-							Thread.Sleep(1);
+							Thread.Sleep(0);
 						}
-						c.UpdatePending = false;
+						chunk.UpdatePending = false;
 					}
 
-					_Manager.Build(c);
+					_Manager.Build(chunk);
 				}
-			}, chunk);
+			}).Start();
 		}
 		else
 		{
@@ -243,7 +242,7 @@ public class World : MonoBehaviour
 				}
 
 		if (MultiThreading)
-			ThreadPool.QueueUserWorkItem(p => BuildChunkColumn((GridPosition)p), columnPosition);
+			new Thread(() => { BuildChunkColumn(columnPosition); }).Start();
 		else
 			BuildChunkColumn(columnPosition);
 	}
@@ -265,7 +264,7 @@ public class World : MonoBehaviour
 
 						chunk = GetChunk(position);
 						while (!chunk.BlocksLoaded)
-							Thread.Sleep(1);
+							Thread.Sleep(0);
 					}
 		}
 
@@ -302,7 +301,7 @@ public class World : MonoBehaviour
 		}
 
 		if (MultiThreading)
-			ThreadPool.QueueUserWorkItem(c => _Manager.Unload((Chunk)c), chunk);
+			new Thread(() => { _Manager.Unload(chunk); }).Start();
 		else
 			_Manager.Unload(chunk);
 	}
