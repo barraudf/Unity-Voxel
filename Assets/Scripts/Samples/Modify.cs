@@ -1,35 +1,29 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
+
 public class Modify : MonoBehaviour
 {
-	public float inputMultiplier = 3f;
-    Vector2 rot;
-    void Update()
+	public float MovementInputModifier = 3f;
+	public float MouseInputModifier = 5f;
+
+	private	Vector2 _Rotation;
+
+    private void FixedUpdate()
     {
-        //RaycastHit hit;
-        //if (Physics.Raycast(transform.position, transform.forward, out hit, 100))
-        //{
-        //    Chunk chunk = hit.collider.GetComponent<Chunk>();
+        _Rotation = new Vector2(
+            _Rotation.x + Input.GetAxis("Mouse X") * MouseInputModifier * Time.fixedDeltaTime,
+            _Rotation.y + Input.GetAxis("Mouse Y") * MouseInputModifier * Time.fixedDeltaTime);
 
-        //    if (chunk != null && Input.GetMouseButtonDown(0))
-        //            World.SetBlock(hit, new BlockAir());
-        //    else if (chunk != null && Input.GetMouseButtonDown(1))
-        //            World.SetBlock(hit, new BlockGrass(), true);
-        //}
+        transform.localRotation = Quaternion.AngleAxis(_Rotation.x, Vector3.up);
+        transform.localRotation *= Quaternion.AngleAxis(_Rotation.y, Vector3.left);
 
-        rot = new Vector2(
-            rot.x + Input.GetAxis("Mouse X") * 3,
-            rot.y + Input.GetAxis("Mouse Y") * 3);
+        transform.position += transform.forward * MovementInputModifier * Input.GetAxis("Vertical") * Time.fixedDeltaTime;
+        transform.position += transform.right * MovementInputModifier * Input.GetAxis("Horizontal") * Time.fixedDeltaTime;
 
-        transform.localRotation = Quaternion.AngleAxis(rot.x, Vector3.up);
-        transform.localRotation *= Quaternion.AngleAxis(rot.y, Vector3.left);
-
-        transform.position += transform.forward * inputMultiplier * Input.GetAxis("Vertical");
-        transform.position += transform.right * inputMultiplier * Input.GetAxis("Horizontal");
 		if (Input.GetKey(KeyCode.E))
-			transform.position += transform.up * inputMultiplier;
+			transform.position += Vector3.up * MovementInputModifier * Time.fixedDeltaTime;
 		if (Input.GetKey(KeyCode.A))
-			transform.position -= transform.up * inputMultiplier;
+			transform.position -= Vector3.up * MovementInputModifier * Time.fixedDeltaTime;
 	}
 }

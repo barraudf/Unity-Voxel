@@ -99,7 +99,6 @@ GameObject:
   - 114: {fileID: 777382503}
   - 114: {fileID: 777382504}
   - 114: {fileID: 777382505}
-  - 114: {fileID: 777382498}
   m_Layer: 0
   m_Name: World
   m_TagString: Untagged
@@ -107,18 +106,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &777382498
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 777382497}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f568cf0677d25624ba00f2c7d956bdb3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MaxLoadPerFrame: 5
 --- !u!23 &777382499
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -221,7 +208,9 @@ MonoBehaviour:
   WorldOrigin: {x: 0, y: 0, z: 0}
   BlockOrigin: {x: 0, y: 0, z: 0}
   ChunkOrigin: {x: 0, y: 0, z: 0}
-  MultiThreading: 1
+  MultiThreading: 0
+  MaxUnloadPerFrame: 1
+  MaxRenderPerFrame: 1
 --- !u!1 &907672563
 GameObject:
   m_ObjectHideFlags: 0
@@ -306,7 +295,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 907672563}
   m_LocalRotation: {x: -.0164549723, y: 0, z: 0, w: .999864697}
-  m_LocalPosition: {x: 0, y: 140, z: -10}
+  m_LocalPosition: {x: 0, y: 84.9000015, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -342,7 +331,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07042d660702e564f801b9a46e55f128, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputMultiplier: .25
+  MovementInputModifier: 40
+  MouseInputModifier: 100
 --- !u!114 &907672571
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -355,7 +345,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   World: {fileID: 777382505}
-  MaxLoadPerFrame: 5
+  RenderDistance: 16
+  MaxLoadPerFrame: 1
   Position:
     x: 0
     y: 0
@@ -391,7 +382,7 @@ Light:
   m_SpotAngle: 30
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 2
+    m_Type: 0
     m_Resolution: -1
     m_Strength: 1
     m_Bias: .0500000007
