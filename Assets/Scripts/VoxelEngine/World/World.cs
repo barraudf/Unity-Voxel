@@ -95,7 +95,7 @@ public class World : MonoBehaviour
 			_Pool.Prefab.AddComponent<MeshCollider>();
 	}
 
-	private void Update()
+	private void FixedUpdate()
 	{
 		UnloadChunksOutOfRange();
 

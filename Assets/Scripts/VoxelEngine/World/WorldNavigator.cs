@@ -19,7 +19,19 @@ public class WorldNavigator : MonoBehaviour
 		Position = GetChunkPositionFromRealPosition();
 	}
 
+	private void FixedUpdate()
+	{
+		if (World.MultiThreading)
+			DoUpdate();
+	}
+
 	private void Update()
+	{
+		if (!World.MultiThreading)
+			DoUpdate();
+	}
+
+	private void DoUpdate()
 	{
 		GridPosition currentChunkPosition = GetChunkPositionFromRealPosition();
         if (_Done == true && !currentChunkPosition.Equals(Position))
