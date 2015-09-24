@@ -21,7 +21,6 @@ public class MeshData
 		mesh.triangles = Triangles;
 		mesh.colors32 = Colors;
 		mesh.RecalculateNormals();
-		mesh.Optimize();
 		return mesh;
 	}
 }
