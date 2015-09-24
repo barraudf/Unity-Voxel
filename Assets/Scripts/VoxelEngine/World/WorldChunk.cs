@@ -19,7 +19,7 @@ public class WorldChunk : Chunk
 	protected override Block GetExternalBlock(int x, int y, int z)
 	{
 		GridPosition chunkOffset = CalculateChunkOffset(x, y, z);
-		GridPosition blockRemotePosition = CalculateBlockPosition(chunkOffset, x, y, z);
+		GridPosition blockRemotePosition = CalculateBlockPosition(x, y, z);
 		WorldChunk chunk = World.GetChunk(Position + chunkOffset);
 
 		if (chunk != null)
@@ -31,7 +31,7 @@ public class WorldChunk : Chunk
 	protected override void SetExternalBlock(int x, int y, int z, Block block)
 	{
 		GridPosition chunkOffset = CalculateChunkOffset(x, y, z);
-		GridPosition blockRemotePosition = CalculateBlockPosition(chunkOffset, x, y, z);
+		GridPosition blockRemotePosition = CalculateBlockPosition(x, y, z);
 		WorldChunk chunk = World.GetChunk(Position + chunkOffset);
 
 		if (chunk != null)
@@ -48,10 +48,10 @@ public class WorldChunk : Chunk
 	public GridPosition CalculateChunkOffset(int x, int y, int z)
 	{
 		return new GridPosition(
-			Mathf.FloorToInt(x / (float)SizeX),
-			Mathf.FloorToInt(y / (float)SizeY),
-			Mathf.FloorToInt(z / (float)SizeZ)
-			);
+			x >> _LogSizeX,
+			y >> _LogSizeY,
+			z >> _LogSizeZ
+            );
 	}
 
 	/// <summary>
@@ -61,33 +61,13 @@ public class WorldChunk : Chunk
 	/// <param name="y">remote local y coordinate of the block</param>
 	/// <param name="z">remote local z coordinate of the block</param>
 	/// <returns>Block position in a remote chunk</returns>
-	public GridPosition CalculateBlockPosition(int x, int y, int z)
-	{
-		return CalculateBlockPosition(CalculateChunkOffset(x, y, z), x, y, z);
-	}
-
-	/// <summary>
-	/// Calculate the local coordinates of a block in another chunk
-	/// </summary>
-	/// <param name="chunkOffset">the other chunk coordinates, relative to the current chunk</param>
-	/// <param name="x">remote local x coordinate of the block</param>
-	/// <param name="y">remote local y coordinate of the block</param>
-	/// <param name="z">remote local z coordinate of the block</param>
-	/// <returns>Block position in a remote chunk</returns>
-	public GridPosition CalculateBlockPosition(GridPosition chunkOffset, int x, int y, int z)
+	public GridPosition CalculateBlockPosition( int x, int y, int z)
 	{
 		return new GridPosition(
-			CalcultateAxisPosition(x, SizeX, chunkOffset.x),
-			CalcultateAxisPosition(y, SizeY, chunkOffset.y),
-			CalcultateAxisPosition(z, SizeZ, chunkOffset.z)
+			x & _MaskX,
+			y & _MaskY,
+			z & _MaskZ
 			);
-	}
-
-	protected int CalcultateAxisPosition(int position, int size, int offset)
-	{
-		int remoteLocalPosition = position - (size * offset);
-
-		return remoteLocalPosition;
 	}
 	#endregion external block position calculation
 
