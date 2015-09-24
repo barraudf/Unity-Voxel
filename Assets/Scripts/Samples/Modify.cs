@@ -9,21 +9,21 @@ public class Modify : MonoBehaviour
 
 	private	Vector2 _Rotation;
 
-    private void FixedUpdate()
+    private void Update()
     {
         _Rotation = new Vector2(
-            _Rotation.x + Input.GetAxis("Mouse X") * MouseInputModifier * Time.fixedDeltaTime,
-            _Rotation.y + Input.GetAxis("Mouse Y") * MouseInputModifier * Time.fixedDeltaTime);
+            _Rotation.x + Input.GetAxis("Mouse X") * MouseInputModifier * Time.deltaTime,
+            _Rotation.y + Input.GetAxis("Mouse Y") * MouseInputModifier * Time.deltaTime);
 
         transform.localRotation = Quaternion.AngleAxis(_Rotation.x, Vector3.up);
         transform.localRotation *= Quaternion.AngleAxis(_Rotation.y, Vector3.left);
 
-        transform.position += transform.forward * MovementInputModifier * Input.GetAxis("Vertical") * Time.fixedDeltaTime;
-        transform.position += transform.right * MovementInputModifier * Input.GetAxis("Horizontal") * Time.fixedDeltaTime;
+        transform.position += transform.forward * MovementInputModifier * Input.GetAxis("Vertical") * Time.deltaTime;
+        transform.position += transform.right * MovementInputModifier * Input.GetAxis("Horizontal") * Time.deltaTime;
 
 		if (Input.GetKey(KeyCode.E))
-			transform.position += Vector3.up * MovementInputModifier * Time.fixedDeltaTime;
+			transform.position += Vector3.up * MovementInputModifier * Time.deltaTime;
 		if (Input.GetKey(KeyCode.A))
-			transform.position -= Vector3.up * MovementInputModifier * Time.fixedDeltaTime;
+			transform.position -= Vector3.up * MovementInputModifier * Time.deltaTime;
 	}
 }
