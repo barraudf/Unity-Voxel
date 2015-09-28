@@ -34,8 +34,9 @@ public class WorldNavigator : MonoBehaviour
 	private void DoUpdate()
 	{
 		GridPosition currentChunkPosition = GetChunkPositionFromRealPosition();
-        if (_Done == true && !currentChunkPosition.Equals(Position))
+        if (_Done = true && !currentChunkPosition.Equals(Position))
 		{
+			_LastI = 0;
 			Position = currentChunkPosition;
 			_Done = false;
 		}
