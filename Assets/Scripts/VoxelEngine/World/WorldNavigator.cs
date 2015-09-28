@@ -104,4 +104,17 @@ public class WorldNavigator : MonoBehaviour
 	{
 		return Mathf.Abs(position.x) + Mathf.Abs(position.z) < RenderDistance * 1.55f;
     }
+
+	private void OnGUI()
+	{
+		GUI.Label(
+			new Rect(10f, 10f, 300f, 50f),
+			string.Format("Position({0:F2},{1:F2},{2:F2})\nChunk({3},{4},{5})",
+				transform.position.x,
+				transform.position.y,
+				transform.position.z,
+				Position.x,
+				Position.y,
+				Position.z));
+	}
 }
