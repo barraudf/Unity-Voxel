@@ -13,11 +13,17 @@ public class WorldNavigator : MonoBehaviour
 	private int _LastI = 0;
 	private bool _Done = false;
 
+	private GUIStyle _Style;
+	private Rect _LabelPosition;
+
 	private void Start ()
 	{
 		World.RegisterNavigator(this);
 		Position = GetChunkPositionFromRealPosition();
-	}
+
+		_Style = new GUIStyle { normal = new GUIStyleState { textColor = Color.black } };
+		_LabelPosition = new Rect(10f, 10f, 300f, 50f);
+    }
 
 	private void FixedUpdate()
 	{
@@ -108,14 +114,16 @@ public class WorldNavigator : MonoBehaviour
 
 	private void OnGUI()
 	{
+		
 		GUI.Label(
-			new Rect(10f, 10f, 300f, 50f),
+			_LabelPosition,
 			string.Format("Position({0:F2},{1:F2},{2:F2})\nChunk({3},{4},{5})",
 				transform.position.x,
 				transform.position.y,
 				transform.position.z,
 				Position.x,
 				Position.y,
-				Position.z));
+				Position.z),
+			_Style);
 	}
 }
