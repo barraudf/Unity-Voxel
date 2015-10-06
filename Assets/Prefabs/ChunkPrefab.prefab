@@ -11,6 +11,7 @@ GameObject:
   - 33: {fileID: 3381402}
   - 23: {fileID: 2390350}
   - 64: {fileID: 6488818}
+  - 114: {fileID: 11405342}
   m_Layer: 0
   m_Name: ChunkPrefab
   m_TagString: Untagged
@@ -73,6 +74,17 @@ MeshCollider:
   serializedVersion: 2
   m_Convex: 0
   m_Mesh: {fileID: 0}
+--- !u!114 &11405342
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 153476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c9103740e0bd1145ab86f587c49caed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

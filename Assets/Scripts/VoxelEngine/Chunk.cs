@@ -185,6 +185,12 @@ public abstract class Chunk
 		SetBlock(position.x, position.y, position.z, block);
 	}
 
+	public virtual void SetBlock(RaycastHit hit, Block block, bool adjacent = false)
+	{
+		GridPosition pos = GetBlockPosition(hit, adjacent);
+		SetBlock(pos, block);
+	}
+
 	protected abstract Block GetExternalBlock(int x, int y, int z);
 	protected abstract void SetExternalBlock(int x, int y, int z, Block block);
 	#endregion get / set blocks
@@ -206,4 +212,41 @@ public abstract class Chunk
 				}
     }
 	#endregion chunk operations
+
+	#region hitbox
+	public virtual bool GetHitBox(RaycastHit hit, out GridPosition position, out Vector3 size)
+	{
+		size = Vector3.zero;
+		position = GridPosition.Zero;
+		return false;
+	}
+
+	protected float MoveWithinBlock(float pos, float norm, bool adjacent = false)
+	{
+		if (pos  % BlockScale == 0)
+		{
+			if ((norm < 0 && adjacent) || (norm > 0 && !adjacent))
+				pos -= BlockScale;
+		}
+
+		return (float)pos;
+	}
+
+	public GridPosition GetBlockPosition(RaycastHit hit, bool adjacent = false)
+	{
+		Vector3 localHitPos = GetLocalPosition(hit.point);
+		Vector3 pos = new Vector3(
+			MoveWithinBlock(localHitPos.x, hit.normal.x, adjacent),
+			MoveWithinBlock(localHitPos.y, hit.normal.y, adjacent),
+			MoveWithinBlock(localHitPos.z, hit.normal.z, adjacent)
+			);
+
+		return new GridPosition(Mathf.FloorToInt(pos.x / BlockScale), Mathf.FloorToInt(pos.y / BlockScale), Mathf.FloorToInt(pos.z / BlockScale));
+	}
+
+	protected virtual Vector3 GetLocalPosition(Vector3 globalPosition)
+	{
+		return globalPosition + (ChunkOrigin + BlockOrigin) * BlockScale;
+	}
+	#endregion hitbox
 }

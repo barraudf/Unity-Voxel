@@ -211,7 +211,7 @@ public class World : MonoBehaviour
 
         for (int i = 0; i < chunk.MeshData.Length; i++)
 		{
-			GameObject go = AttachMesh(chunk.MeshData[i]);
+			GameObject go = AttachMesh(chunk, chunk.MeshData[i]);
 			if (go == null)
 				break;
 			go.transform.position = goPosition;
@@ -344,20 +344,21 @@ public class World : MonoBehaviour
 	/// </summary>
 	/// <param name="mesh">Mesh to attach</param>
 	/// <returns>The "instantiated" GameObject</returns>
-	private GameObject AttachMesh(MeshData meshData)
+	private GameObject AttachMesh(Chunk chunk, MeshData meshData)
 	{
 		GameObject go = _Pool.NextObject();
 
 		if (go != null)
 		{
-			go.SetActive(true);
-
+			go.name = chunk.ToString();
 			MeshFilter filter = go.GetComponent<MeshFilter>();
 			MeshCollider col = go.GetComponent<MeshCollider>();
+			ChunkMesh chunkMesh = go.GetComponent<ChunkMesh>();
 
 			Mesh mesh = meshData.ToMesh();
 			filter.sharedMesh = mesh;
 			col.sharedMesh = mesh;
+			chunkMesh.Chunk = chunk;
 		}
 		else
 		{

@@ -288,4 +288,14 @@ public class MVChunk : Chunk
 
 		Palette = tex.GetPixels();
 	}
+
+	public override bool GetHitBox(RaycastHit hit, out GridPosition position, out Vector3 size)
+	{
+		position = GridPosition.Zero;
+		size = new Vector3(
+			SizeX * BlockScale,
+			SizeY * BlockScale,
+			SizeZ * BlockScale);
+		return true;
+	}
 }

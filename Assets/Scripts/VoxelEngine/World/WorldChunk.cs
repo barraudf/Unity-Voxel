@@ -16,6 +16,13 @@ public class WorldChunk : Chunk
 	}
 
 	#region external block position calculation
+	public override void SetBlock(RaycastHit hit, Block block, bool adjacent = false)
+	{
+		GridPosition pos = GetBlockPosition(hit, adjacent);
+		pos -= Position * new GridPosition(SizeX, SizeY, SizeZ);
+		SetBlock(pos, block);
+	}
+
 	protected override Block GetExternalBlock(int x, int y, int z)
 	{
 		GridPosition chunkOffset = CalculateChunkOffset(x, y, z);
@@ -82,5 +89,45 @@ public class WorldChunk : Chunk
 			(Position.y * World.ChunkSizeY * World.BlockScale) - World.WorldOrigin.y,
 			(Position.z * World.ChunkSizeZ * World.BlockScale) - World.WorldOrigin.z
 			);
+	}
+
+	protected override Vector3 GetLocalPosition(Vector3 globalPosition)
+	{
+		return base.GetLocalPosition(globalPosition) + World.WorldOrigin;
+	}
+
+	#region hitbox
+	public override bool GetHitBox(RaycastHit hit, out GridPosition position, out Vector3 size)
+	{
+		GridPosition blockPosition = GetBlockPosition(hit);
+		blockPosition -= Position * new GridPosition(SizeX, SizeY, SizeZ);
+
+		if (GetBlock(blockPosition) != null)
+		{
+			size = new Vector3(BlockScale, BlockScale, BlockScale);
+			position = blockPosition;
+			return true;
+		}
+		else
+			return base.GetHitBox(hit, out position, out size);
+	}
+	#endregion hitbox
+
+	public override void SetBlock(int x, int y, int z, Block block)
+	{
+		SetBlock(x, y, z, block, true);
+	}
+
+	public void SetBlock(int x, int y, int z, Block block, bool rebuildMesh)
+	{
+		base.SetBlock(x, y, z, block);
+
+		if (IsLocalCoordinates(x, y, z) && rebuildMesh)
+			World.BuildChunk(this);
+	}
+
+	public override string ToString()
+	{
+		return string.Format("Chunk({0},{1},{2})", Position.x, Position.y, Position.z);
 	}
 }
