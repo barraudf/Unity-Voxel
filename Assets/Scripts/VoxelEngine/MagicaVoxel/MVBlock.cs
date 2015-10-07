@@ -53,6 +53,12 @@ public class MVBlock : Block
 		return color;
 	}
 
+	public override SubMeshes GetSubMesh()
+	{
+		Color32 color = GetBlockColor();
+		return color.a == 255 ? SubMeshes.Opac : SubMeshes.Transparent;
+	}
+
 	public override bool IsFaceVisible(Direction direction, Block adjacentBlock)
 	{
         MVBlock block = adjacentBlock as MVBlock;

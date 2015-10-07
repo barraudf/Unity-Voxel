@@ -191,7 +191,7 @@ public class GreedyMeshBuilder : ChunkMeshBuilder
 									break;
 							}
 
-							meshBuilder.AddQuad(vertices, block.GetBlockColor());
+							meshBuilder.AddQuad(vertices, block.GetBlockColor(), block.GetSubMesh());
 						}
 					}
 		}

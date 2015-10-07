@@ -1,24 +1,23 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class MeshBuilder
 {
-	/// <summary>
-	/// Soft maximum number of vertices per mesh. Can not be more than Unity limit (which is equal to UInt16.MaxValue)
-	/// </summary>
-	public int SoftVerticesCountLimit;
-
 	private List<Vector3> _Vertices;
-	private List<int> _Triangles;
+	private List<int>[] _Triangles;
 	private List<Color32> _Colors;
 	private List<MeshData> _MeshData;
 
 	public MeshBuilder()
 	{
-		SoftVerticesCountLimit = System.UInt16.MaxValue;
+		int submeshesCount = Enum.GetValues(typeof(SubMeshes)).Length;
+
 		_Vertices = new List<Vector3>();
-		_Triangles = new List<int>();
+		_Triangles = new List<int>[submeshesCount];
+		for(int i = 0; i < submeshesCount; i++)
+			_Triangles[i] = new List<int>();
 		_Colors = new List<Color32>();
 		_MeshData = new List<MeshData>(1);
 	}
@@ -28,7 +27,7 @@ public class MeshBuilder
 	/// </summary>
 	/// <param name="vertices">List of vertices of the quad (order is important!).</param>
 	/// <param name="color">Color to apply to all 4 vertices</param>
-	public void AddQuad(Vector3[] vertices, Color32 color)
+	public void AddQuad(Vector3[] vertices, Color32 color, SubMeshes subMesh)
 	{
 		if (!CheckVerticeCount(4, vertices.Length))
 			return;
@@ -40,13 +39,13 @@ public class MeshBuilder
 		}
 
 		int vertCount = _Vertices.Count;
-		_Triangles.Add(vertCount - 4);
-		_Triangles.Add(vertCount - 3);
-		_Triangles.Add(vertCount - 1);
+		_Triangles[(int)subMesh].Add(vertCount - 4);
+		_Triangles[(int)subMesh].Add(vertCount - 3);
+		_Triangles[(int)subMesh].Add(vertCount - 1);
 
-		_Triangles.Add(vertCount - 1);
-		_Triangles.Add(vertCount - 3);
-		_Triangles.Add(vertCount - 2);
+		_Triangles[(int)subMesh].Add(vertCount - 1);
+		_Triangles[(int)subMesh].Add(vertCount - 3);
+		_Triangles[(int)subMesh].Add(vertCount - 2);
 	}
 
 	/// <summary>
@@ -54,7 +53,11 @@ public class MeshBuilder
 	/// </summary>
 	private void FlushMeshData()
 	{
-		MeshData meshData = new MeshData(_Vertices.ToArray(), _Triangles.ToArray(), _Colors.ToArray());
+		int[][] triangles;
+		triangles = new int[_Triangles.Length][];
+		for (int i = 0; i < _Triangles.Length; i++)
+			triangles[i] = _Triangles[i].ToArray();
+		MeshData meshData = new MeshData(_Vertices.ToArray(), triangles, _Colors.ToArray());
 		_MeshData.Add(meshData);
 		Clear();
 	}
@@ -65,7 +68,8 @@ public class MeshBuilder
 	public void Clear()
 	{
 		_Vertices.Clear();
-		_Triangles.Clear();
+		for (int i = 0; i < _Triangles.Length; i++)
+			_Triangles[i].Clear();
 		_Colors.Clear();
 	}
 
@@ -93,7 +97,7 @@ public class MeshBuilder
 			return false;
 		}
 
-		if (_Vertices.Count + actualVertexCount > System.UInt16.MaxValue || _Vertices.Count + actualVertexCount > SoftVerticesCountLimit)
+		if (_Vertices.Count + actualVertexCount > System.UInt16.MaxValue)
 			FlushMeshData();
 
 		return true;

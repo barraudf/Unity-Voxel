@@ -33,6 +33,15 @@ public abstract class Block
 	}
 
 	/// <summary>
+	/// Determines which submesh the block belongs to
+	/// </summary>
+	/// <returns>the submesh</returns>
+	public virtual SubMeshes GetSubMesh()
+	{
+		return SubMeshes.Opac;
+	}
+
+	/// <summary>
 	/// Determines if a face should be visible, given the block adjacent to this face
 	/// </summary>
 	/// <param name="direction">Direction (from [adjacentBlock] to current block)</param>

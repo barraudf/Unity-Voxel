@@ -39,10 +39,10 @@ public class SimpleMeshBuilder : ChunkMeshBuilder
 		Block otherBlock = chunk.GetBlock(otherBlockPosition.x, otherBlockPosition.y, otherBlockPosition.z);
 
 		if (block.IsFaceVisible(direction.Opposite(), otherBlock))
-			BuildFace(blockPosition, block.GetBlockColor(), direction, chunk, meshBuilder, chunk.BlockScale);
+			BuildFace(blockPosition, block, direction, chunk, meshBuilder, chunk.BlockScale);
 	}
 
-	private void BuildFace(GridPosition blockPosition, Color32 color, Direction direction, Chunk chunk, MeshBuilder meshBuilder, float blockScale)
+	private void BuildFace(GridPosition blockPosition, Block block, Direction direction, Chunk chunk, MeshBuilder meshBuilder, float blockScale)
 	{
 		Vector3[] vertices = new Vector3[4];
 
@@ -103,6 +103,6 @@ public class SimpleMeshBuilder : ChunkMeshBuilder
 				break;
 		}
 
-		meshBuilder.AddQuad(vertices, color);
+		meshBuilder.AddQuad(vertices, block.GetBlockColor(), block.GetSubMesh());
 	}
 }
