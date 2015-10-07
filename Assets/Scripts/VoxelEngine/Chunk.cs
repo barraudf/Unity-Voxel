@@ -49,9 +49,6 @@ public abstract class Chunk
 	/// </summary>
 	public float BlockScale;
 
-	protected int _MaskX, _MaskY, _MaskZ;
-	protected int _LogSizeX, _LogSizeY, _LogSizeZ;
-
 	public Chunk()
 	{
 		ChunkOrigin = Vector3.zero;
@@ -66,27 +63,7 @@ public abstract class Chunk
 
 	public virtual void InitBlocks(int sizeX, int sizeY, int sizeZ)
 	{
-		if ((sizeX & (sizeX - 1)) != 0 || (sizeY & (sizeY - 1)) != 0 || (sizeZ & (sizeZ - 1)) != 0)
-		{
-			Debug.LogErrorFormat("Invalid chunk size ({0},{1},{2}). Size have to be a power of 2", sizeX, sizeY, sizeZ);
-			return;
-		}
-
-		_LogSizeX = SetLogSize(sizeX);
-		_LogSizeY = SetLogSize(sizeY);
-		_LogSizeZ = SetLogSize(sizeZ);
-		_MaskX = sizeX - 1;
-		_MaskY = sizeY - 1;
-		_MaskZ = sizeZ - 1;
 		Blocks = new Block[sizeX, sizeY, sizeZ];
-	}
-
-	protected static int SetLogSize(int size)
-	{
-		int i = 0;
-		while (1 << i != size)
-			i++;
-		return i;
 	}
 
 	#region States of the chunk

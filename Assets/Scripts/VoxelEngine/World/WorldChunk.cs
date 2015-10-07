@@ -8,11 +8,32 @@ public class WorldChunk : Chunk
 
 	public GridPosition Position;
 
+	protected int _MaskX, _MaskY, _MaskZ;
+	protected int _LogSizeX, _LogSizeY, _LogSizeZ;
+
 	public WorldChunk(World world, GridPosition position)
 		:base()
 	{
 		World = world;
 		Position = position;
+	}
+
+	public override void InitBlocks(int sizeX, int sizeY, int sizeZ)
+	{
+		if ((sizeX & (sizeX - 1)) != 0 || (sizeY & (sizeY - 1)) != 0 || (sizeZ & (sizeZ - 1)) != 0)
+		{
+			Debug.LogErrorFormat("Invalid chunk size ({0},{1},{2}). Size have to be a power of 2", sizeX, sizeY, sizeZ);
+			return;
+		}
+
+		_LogSizeX = SetLogSize(sizeX);
+		_LogSizeY = SetLogSize(sizeY);
+		_LogSizeZ = SetLogSize(sizeZ);
+		_MaskX = sizeX - 1;
+		_MaskY = sizeY - 1;
+		_MaskZ = sizeZ - 1;
+
+		base.InitBlocks(sizeX, sizeY, sizeZ);
 	}
 
 	#region external block position calculation
@@ -129,5 +150,13 @@ public class WorldChunk : Chunk
 	public override string ToString()
 	{
 		return string.Format("Chunk({0},{1},{2})", Position.x, Position.y, Position.z);
+	}
+
+	protected static int SetLogSize(int size)
+	{
+		int i = 0;
+		while (1 << i != size)
+			i++;
+		return i;
 	}
 }
