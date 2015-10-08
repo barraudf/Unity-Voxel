@@ -24,9 +24,9 @@ public struct GridPosition
 	[NonSerialized]
 	public static readonly GridPosition Left = new GridPosition(-1, 0, 0);
 	[NonSerialized]
-	public static readonly GridPosition Forward = new GridPosition(0, 0, -1);
+	public static readonly GridPosition Forward = new GridPosition(0, 0, 1);
 	[NonSerialized]
-	public static readonly GridPosition Backward = new GridPosition(0, 0, 1);
+	public static readonly GridPosition Backward = new GridPosition(0, 0, -1);
 
 	public int x;
 	public int y;

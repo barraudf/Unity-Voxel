@@ -8,6 +8,7 @@ public class TargetEditor : MonoBehaviour
 	public float TargetMaxDistance = 100f;
 	public Color BoxColor = Color.black;
 	public float SelectionBoxScale = 1.1f;
+	public bool ShowCoords = true;
 
 	protected Vector3[] _Vertices;
 	protected RaycastHit _Hit;
@@ -17,6 +18,9 @@ public class TargetEditor : MonoBehaviour
 	protected Chunk _LastChunkHit;
 	protected Vector3 _HitBoxPosition;
 	protected static Material _SelectionBoxMaterial = null;
+
+	private GUIStyle _Style;
+	private Rect _LabelPosition;
 
 	protected void FixedUpdate()
 	{
@@ -71,6 +75,9 @@ public class TargetEditor : MonoBehaviour
 	protected void Awake()
 	{
 		CreateMaterial();
+
+		_Style = new GUIStyle { normal = new GUIStyleState { textColor = Color.black } };
+		_LabelPosition = new Rect(Screen.width / 2 + 10f, Screen.height / 2 + 10f, 300f, 50f);
 	}
 
 	protected void OnPostRender()
@@ -144,5 +151,22 @@ public class TargetEditor : MonoBehaviour
 		vertices.Add(SelectionBoxScale * (Vector3.right * size.x + Vector3.up * size.y));
 
 		_Vertices = vertices.ToArray();
+	}
+
+	private void OnGUI()
+	{
+		if (ShowCoords && _TargetHit)
+		{
+			GUI.Label(
+				_LabelPosition,
+				string.Format("Chunk({0},{1},{2})\nBlock({3},{4},{5})",
+					_LastChunkHitPosition.x,
+					_LastChunkHitPosition.y,
+					_LastChunkHitPosition.z,
+					_LastHitBlockPosition.x,
+					_LastHitBlockPosition.y,
+					_LastHitBlockPosition.z),
+				_Style);
+		}
 	}
 }

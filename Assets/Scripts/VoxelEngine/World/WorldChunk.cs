@@ -144,7 +144,22 @@ public class WorldChunk : Chunk
 		base.SetBlock(x, y, z, block);
 
 		if (IsLocalCoordinates(x, y, z) && rebuildMesh)
+		{
 			World.BuildChunk(this);
+
+			if (x == 0)
+				World.BuildChunk(World.GetChunk(Position + GridPosition.Left));
+			if (x == SizeX - 1)
+				World.BuildChunk(World.GetChunk(Position + GridPosition.Right));
+			if (y == 0)
+				World.BuildChunk(World.GetChunk(Position + GridPosition.Down));
+			if (y == SizeY - 1)
+				World.BuildChunk(World.GetChunk(Position + GridPosition.Up));
+			if (z == 0)
+				World.BuildChunk(World.GetChunk(Position + GridPosition.Backward));
+			if (z == SizeZ - 1)
+				World.BuildChunk(World.GetChunk(Position + GridPosition.Forward));
+		}
 	}
 
 	public override string ToString()

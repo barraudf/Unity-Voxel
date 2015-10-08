@@ -166,6 +166,9 @@ public class World : MonoBehaviour
 	/// <param name="chunk"></param>
 	public void BuildChunk(WorldChunk chunk)
 	{
+		if (chunk == null)
+			return;
+
 		if (MultiThreading)
 		{
 			new Thread(() =>
