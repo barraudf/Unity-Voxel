@@ -3,15 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 
 [RequireComponent(typeof(ObjectPool))]
-public class SampleMVComponent : MonoBehaviour
+public class SampleMVComponent : MVModel
 {
 	private ObjectPool pool;
 
 	private MVChunk chunk;
-
-	private ChunkLoader _Loader;
-	private ChunkMeshBuilder _MeshBuilder;
-	private ChunkUnloader _Unloader;
 
 	private void Start ()
 	{
@@ -30,7 +26,7 @@ public class SampleMVComponent : MonoBehaviour
 		_Unloader = new SimpleUnloader();
 		_MeshBuilder = builder;
 
-		chunk = new MVChunk();
+		chunk = new MVChunk(this);
 		Load(chunk);
 		//chunk.LoadPalette(tex);
 		Build(chunk);
@@ -39,39 +35,19 @@ public class SampleMVComponent : MonoBehaviour
 
 		for (int i = 0; i < chunk.MeshData.Length; i++)
 		{
-			GOs.Add(AttachMesh(chunk.MeshData[i]));
+			GameObject go = pool.NextObject();
+
+			if (go == null)
+			{
+				Debug.LogError("Pool has no GameObject available");
+				break;
+			}
+			AttachMesh(go, chunk, chunk.MeshData[i]);
+
+			go.transform.localPosition = Vector3.zero;
+			GOs.Add(go);
 		}
 
 		chunk.GameObjects = GOs.ToArray();
-	}
-
-	protected virtual void Load(Chunk chunk)
-	{
-		_Loader.LoadChunk(chunk);
-		chunk.BlocksLoaded = true;
-	}
-
-	protected virtual void Build(Chunk chunk)
-	{
-		chunk.Busy = true;
-		chunk.MeshData = _MeshBuilder.BuildMeshes(chunk);
-		chunk.MeshDataLoaded = true;
-	}
-
-	private GameObject AttachMesh(MeshData meshData)
-	{
-		GameObject go = pool.NextObject();
-
-		go.SetActive(true);
-
-		MeshFilter filter = go.GetComponent<MeshFilter>();
-		MeshCollider col = go.GetComponent<MeshCollider>();
-
-		Mesh mesh = meshData.ToMesh();
-
-		filter.sharedMesh = mesh;
-		col.sharedMesh = mesh;
-
-		return go;
 	}
 }

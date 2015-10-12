@@ -7,7 +7,7 @@ public class MVBlockTest
 	[Test]
 	public void GetBlockColorTest()
 	{
-		MVChunk chunk = new MVChunk();
+		MVChunk chunk = new MVChunk(null);
 		chunk.Palette = new Color[] { Color.white, Color.blue };
 		chunk.Name = "TestChunk";
 		chunk.InitBlocks(3, 1, 1);

@@ -172,7 +172,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f00d55e7ba45fd94ab62c54a4988670a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PoolSize: 100
+  PoolSize: 400
   PrePopulate: 1
   CanGrow: 1
   Prefab: {fileID: 153476, guid: e8c3052f60db00d4da9a11d3e72af016, type: 2}
@@ -202,13 +202,13 @@ MonoBehaviour:
   ChunkSizeY: 128
   ChunkSizeZ: 16
   BlockScale: 1
+  WorldOriginPoint: {x: 0, y: 0, z: 0}
+  BlockOriginPoint: {x: 0, y: 0, z: 0}
+  ChunkOriginPoint: {x: 0, y: 0, z: 0}
+  MultiThreading: 1
   MaxChunkX: 0
   MaxChunkY: 1
   MaxChunkZ: 0
-  WorldOrigin: {x: 0, y: 0, z: 0}
-  BlockOrigin: {x: 0, y: 0, z: 0}
-  ChunkOrigin: {x: 0, y: 0, z: 0}
-  MultiThreading: 0
   MaxUnloadPerFrame: 1
   MaxRenderPerFrame: 1
 --- !u!1 &907672563
@@ -226,6 +226,8 @@ GameObject:
   - 114: {fileID: 907672569}
   - 114: {fileID: 907672570}
   - 114: {fileID: 907672571}
+  - 114: {fileID: 907672572}
+  - 114: {fileID: 907672573}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -332,7 +334,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MovementInputModifier: 40
-  MouseInputModifier: 100
+  MouseInputModifier: 200
 --- !u!114 &907672571
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -345,12 +347,39 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   World: {fileID: 777382505}
-  RenderDistance: 16
+  RenderDistance: 8
   MaxLoadPerFrame: 1
   Position:
     x: 0
     y: 0
     z: 0
+--- !u!114 &907672572
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 907672563}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d303cfacd766214d823c3b67646e2dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TargetMaxDistance: 40
+  BoxColor: {r: 0, g: 0, b: 0, a: 1}
+  SelectionBoxScale: 1.10000002
+  ShowCoords: 1
+--- !u!114 &907672573
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 907672563}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f296d17b0e80ea6489f7960e4d89d005, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Texture: {fileID: 2800000, guid: 19a7baa4d45f2cb41853d9cae23907bb, type: 3}
 --- !u!1 &976916938
 GameObject:
   m_ObjectHideFlags: 0
