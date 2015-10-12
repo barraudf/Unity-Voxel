@@ -27,12 +27,12 @@ public abstract class Chunk
 	/// <summary>
 	/// The pivot point of the mesh
 	/// </summary>
-	public Vector3 ChunkOrigin;
+	public Vector3 ChunkOriginPoint {  get { return _Container.ChunkOriginPoint; } }
 
 	/// <summary>
-	/// coordinates of the pivot point (expressed in grid unit, so new Vector3(0.5f,0.5f,0.5f) would be the center of the block)
+	/// coordinates of the pivot point
 	/// </summary>
-	public Vector3 BlockOrigin;
+	public Vector3 BlockOriginPoint { get { return _Container.BlockOriginPoint; } }
 
 	/// <summary>
 	/// One or more mesh to hold the chunk model
@@ -49,16 +49,17 @@ public abstract class Chunk
 	/// </summary>
 	public float BlockScale;
 
-	public Chunk()
+	protected ChunkContainer _Container;
+
+	public Chunk(ChunkContainer container)
 	{
-		ChunkOrigin = Vector3.zero;
+		_Container = container;
 		ColumnLoaded = false;
 		BlocksLoaded = false;
 		DeleteRequested = false;
 		MeshDataLoaded = false;
 		Busy = false;
 		BlockScale = 1f;
-		BlockOrigin = Vector3.zero;
 	}
 
 	public virtual void InitBlocks(int sizeX, int sizeY, int sizeZ)
@@ -144,11 +145,6 @@ public abstract class Chunk
 			return GetExternalBlock(x, y, z);
 	}
 
-	public Block GetBlock(GridPosition position)
-	{
-		return GetBlock(position.x, position.y, position.z);
-	}
-
 	public virtual void SetBlock(int x, int y, int z, Block block)
 	{
 		if (IsLocalCoordinates(x, y, z))
@@ -157,15 +153,10 @@ public abstract class Chunk
 			SetExternalBlock(x, y, z, block);
 	}
 
-	public void SetBlock(GridPosition position, Block block)
-	{
-		SetBlock(position.x, position.y, position.z, block);
-	}
-
 	public virtual void SetBlock(RaycastHit hit, Block block, bool adjacent = false)
 	{
 		GridPosition pos = GetBlockPosition(hit, adjacent);
-		SetBlock(pos, block);
+		SetBlock(pos.x, pos.y, pos.z, block);
 	}
 
 	protected abstract Block GetExternalBlock(int x, int y, int z);
@@ -179,13 +170,13 @@ public abstract class Chunk
 			for (int y = 0; y < otherChunk.SizeY; y++)
 				for (int z = 0; z < otherChunk.SizeZ; z++)
 				{
-					Vector3 vect = new Vector3(x, y, z) - otherChunk.ChunkOrigin;
+					Vector3 vect = new Vector3(x, y, z) - otherChunk.ChunkOriginPoint;
 					vect = rotation * vect;
 					GridPosition blockPosition = position + new GridPosition( Mathf.RoundToInt(vect.x), Mathf.RoundToInt(vect.y), Mathf.RoundToInt(vect.z) );
 
 					Block block = otherChunk.GetBlock(x,y,z);
 					if(block != null || ConsiderEmptyBlocks)
-						SetBlock(blockPosition, block);
+						SetBlock(blockPosition.x, blockPosition.y, blockPosition.z, block);
 				}
     }
 	#endregion chunk operations
@@ -223,7 +214,7 @@ public abstract class Chunk
 
 	protected virtual Vector3 GetLocalPosition(Vector3 globalPosition)
 	{
-		return globalPosition + (ChunkOrigin + BlockOrigin) * BlockScale;
+		return globalPosition + ChunkOriginPoint + BlockOriginPoint;
 	}
 	#endregion hitbox
 }

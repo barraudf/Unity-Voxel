@@ -40,10 +40,10 @@ public class TargetEditor : MonoBehaviour
 						_TargetHit = true;
 
 						float offset = (SelectionBoxScale - 1) * 0.5f;
-						_HitBoxPosition = (new Vector3(
+						_HitBoxPosition = new Vector3(
 							(float)hbBlockPosition.x - offset,
 							(float)hbBlockPosition.y - offset,
-							(float)hbBlockPosition.z - offset) - chunk.BlockOrigin - chunk.ChunkOrigin) * chunk.BlockScale + chunkMesh.transform.position;
+							(float)hbBlockPosition.z - offset) * chunk.BlockScale + chunkMesh.transform.position - chunk.BlockOriginPoint - chunk.ChunkOriginPoint;
 						BuildSelectionBox(hbSize);
 						_LastHitBlockPosition = hbBlockPosition;
 						_LastChunkHit = chunk;

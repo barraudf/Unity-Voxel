@@ -31,6 +31,12 @@ public class ChunkTest
 
 	private class TestChunk : Chunk
 	{
+		public TestChunk()
+			: base(null)
+		{
+
+		}
+
 		protected override Block GetExternalBlock(int x, int y, int z)
 		{
 			throw new NotImplementedException();

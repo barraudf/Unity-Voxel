@@ -269,6 +269,12 @@ public class MVChunk : Chunk
 	public string Name;
 	public byte[] Version;
 
+	public MVChunk(MVModel model)
+		:base(model)
+	{
+
+	}
+
 	protected override Block GetExternalBlock(int x, int y, int z)
 	{
 		return null;

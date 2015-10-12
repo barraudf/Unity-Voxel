@@ -44,11 +44,11 @@ public class SampleChunkLoader : ChunkLoader
 				{
 					if (y <= stoneHeight)
 					{
-						chunk.SetBlock(x, y, z, SampleBlock2.Instance);
+						wChunk.SetBlock(x, y, z, SampleBlock2.Instance, false);
 					}
 					else if (y <= dirtHeight)
 					{
-						chunk.SetBlock(x, y, z, SampleBlock.Instance);
+						wChunk.SetBlock(x, y, z, SampleBlock.Instance, false);
 					}
 				}
 			}

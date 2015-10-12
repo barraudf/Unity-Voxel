@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 
 [RequireComponent(typeof(ObjectPool))]
-public class World : MonoBehaviour
+public class World : ChunkContainer
 {
 	#region fields
 	/// <summary>
@@ -15,26 +15,6 @@ public class World : MonoBehaviour
 	/// Chunks loaded into memory, optimized for enumeration
 	/// </summary>
 	private List<WorldChunk> ChunkList = new List<WorldChunk>();
-
-	/// <summary>
-	/// Number of blocks in each chunks on the X axis
-	/// </summary>
-	public int ChunkSizeX = 16;
-
-	/// <summary>
-	/// Number of blocks in each chunks on the Y axis
-	/// </summary>
-	public int ChunkSizeY = 64;
-
-	/// <summary>
-	/// Number of blocks in each chunks on the Z axis
-	/// </summary>
-	public int ChunkSizeZ = 16;
-
-	/// <summary>
-	/// Size of each block (in Unity unit)
-	/// </summary>
-	public float BlockScale = 1f;
 
 	/// <summary>
 	/// Maximum number of chunk on the X axis (0 means unlimited)
@@ -51,48 +31,39 @@ public class World : MonoBehaviour
 	/// </summary>
 	public int MaxChunkZ = 0;
 
-	/// <summary>
-	/// Origin point of the world
-	/// </summary>
-	public Vector3 WorldOrigin = Vector3.zero;
-
-	/// <summary>
-	/// coordinates of the pivot point (expressed in grid unit, so new Vector3(0.5f,0.5f,0.5f) would be the center of the block)
-	/// </summary>
-	public Vector3 BlockOrigin = Vector3.zero;
-
-	/// <summary>
-	/// The pivot point of the chunk (expressed in grid unit)
-	/// </summary>
-	public Vector3 ChunkOrigin = Vector3.zero;
-
-	/// <summary>
-	/// Should we use multithreading for chunk operations?
-	/// </summary>
-	public bool MultiThreading = true;
-
 	public int MaxUnloadPerFrame = 1;
 	public int MaxRenderPerFrame = 1;
 
 	private List<WorldNavigator> _Navigators;
 	private ObjectPool _Pool;
-	private ChunkManager _Manager;
 
 	private int _LastIndexUnloaded = 0;
 	private WorldChunk[] _UnloadingList;
+
+	protected int _MaskX, _MaskY, _MaskZ;
+	protected int _LogSizeX, _LogSizeY, _LogSizeZ;
 	#endregion fields
 
-	private void Awake()
+	protected void Awake()
 	{
+		_Loader = new SampleSimpleChunkLoader();
+		_Unloader = new SimpleUnloader();
+		_MeshBuilder = new GreedyMeshBuilder();
+
 		_Navigators = new List<WorldNavigator>();
 		_Pool = GetComponent<ObjectPool>();
-		_Manager = new ChunkManager(new SampleChunkLoader(), new SimpleUnloader(), new GreedyMeshBuilder());
+		
 
 		// Ensure the prefab has required components
-		if (_Pool.Prefab.GetComponent<MeshFilter>() == null)
-			_Pool.Prefab.AddComponent<MeshFilter>();
-		if (_Pool.Prefab.GetComponent<MeshCollider>() == null)
-			_Pool.Prefab.AddComponent<MeshCollider>();
+		if (_Pool == null)
+			_Pool.Prefab.AddComponent<ObjectPool>();
+
+		_LogSizeX = SetLogSize(ChunkSizeX);
+		_LogSizeY = SetLogSize(ChunkSizeY);
+		_LogSizeZ = SetLogSize(ChunkSizeZ);
+		_MaskX = ChunkSizeX - 1;
+		_MaskY = ChunkSizeY - 1;
+		_MaskZ = ChunkSizeZ - 1;
 	}
 
 	private void FixedUpdate()
@@ -129,10 +100,11 @@ public class World : MonoBehaviour
 	/// <returns>The chunk if it is loaded or null otherwise</returns>
 	public WorldChunk GetChunk(GridPosition position)
 	{
-		if (Chunks.ContainsKey(position))
-			return Chunks[position];
-		else
-			return null;
+		WorldChunk chunk = null;
+
+		Chunks.TryGetValue(position, out chunk);
+
+		return chunk;
 	}
 
 	/// <summary>
@@ -143,8 +115,6 @@ public class World : MonoBehaviour
 	public WorldChunk LoadChunk(GridPosition position)
 	{
 		WorldChunk chunk = new WorldChunk(this, position);
-		chunk.BlockOrigin = BlockOrigin;
-		chunk.ChunkOrigin = ChunkOrigin;
 		chunk.BlockScale = BlockScale;
 		Chunks.Add(position, chunk);
 		ChunkList.Add(chunk);
@@ -152,9 +122,9 @@ public class World : MonoBehaviour
 		if (!chunk.BlocksLoaded)
 		{
 			if (MultiThreading)
-				new Thread(() => { _Manager.Load(chunk); }).Start();
+				new Thread(() => { Load(chunk); }).Start();
 			else
-				_Manager.Load(chunk);
+				Load(chunk);
 		}
 
 		return chunk;
@@ -185,13 +155,13 @@ public class World : MonoBehaviour
 						chunk.UpdatePending = false;
 					}
 
-					_Manager.Build(chunk);
+					Build(chunk);
 				}
 			}).Start();
 		}
 		else
 		{
-			_Manager.Build(chunk);
+			Build(chunk);
 		}
 	}
 
@@ -214,9 +184,15 @@ public class World : MonoBehaviour
 
         for (int i = 0; i < chunk.MeshData.Length; i++)
 		{
-			GameObject go = AttachMesh(chunk, chunk.MeshData[i]);
+			GameObject go = _Pool.NextObject();
+
 			if (go == null)
+			{
+				Debug.LogError("Pool has no GameObject available");
 				break;
+			}
+			AttachMesh(go, chunk, chunk.MeshData[i]);
+
 			go.transform.position = goPosition;
 			GOs.Add(go);
 		}
@@ -303,11 +279,11 @@ public class World : MonoBehaviour
 		}
 
 		if (MultiThreading)
-			new Thread(() => { _Manager.Unload(chunk); }).Start();
+			new Thread(() => { Unload(chunk); }).Start();
 		else
-			_Manager.Unload(chunk);
+			Unload(chunk);
 	}
-
+	
 	private void UnloadChunksOutOfRange()
 	{
 		if (_LastIndexUnloaded == 0)
@@ -342,35 +318,6 @@ public class World : MonoBehaviour
     }
 	#endregion Chunk management
 
-	/// <summary>
-	/// Get a GameObject from the pool and attach a mesh to it
-	/// </summary>
-	/// <param name="mesh">Mesh to attach</param>
-	/// <returns>The "instantiated" GameObject</returns>
-	private GameObject AttachMesh(Chunk chunk, MeshData meshData)
-	{
-		GameObject go = _Pool.NextObject();
-
-		if (go != null)
-		{
-			go.name = chunk.ToString();
-			MeshFilter filter = go.GetComponent<MeshFilter>();
-			MeshCollider col = go.GetComponent<MeshCollider>();
-			ChunkMesh chunkMesh = go.GetComponent<ChunkMesh>();
-
-			Mesh mesh = meshData.ToMesh();
-			filter.sharedMesh = mesh;
-			col.sharedMesh = mesh;
-			chunkMesh.Chunk = chunk;
-		}
-		else
-		{
-			Debug.LogError("Pool has no GameObject available");
-		}
-
-		return go;
-	}
-
 	#region navigators
 	public void RegisterNavigator(WorldNavigator navigator)
 	{
@@ -384,4 +331,44 @@ public class World : MonoBehaviour
 			_Navigators.Remove(navigator);
 	}
 	#endregion navigators
+
+	protected static int SetLogSize(int size)
+	{
+		int i = 0;
+		while (1 << i != size)
+			i++;
+		return i;
+	}
+
+	/// <summary>
+	/// Calculate the chunk position (relative to the current chunk) of a block of the given local coordinates
+	/// </summary>
+	/// <param name="x">x coordinate of the block, relative to the current chunk</param>
+	/// <param name="y">y coordinate of the block, relative to the current chunk</param>
+	/// <param name="z">z coordinate of the block, relative to the current chunk</param>
+	/// <returns>chunk position</returns>
+	public GridPosition CalculateChunkOffset(int x, int y, int z)
+	{
+		return new GridPosition(
+			x >> _LogSizeX,
+			y >> _LogSizeY,
+			z >> _LogSizeZ
+			);
+	}
+
+	/// <summary>
+	/// Calculate the local coordinates of a block in another chunk
+	/// </summary>
+	/// <param name="x">remote local x coordinate of the block</param>
+	/// <param name="y">remote local y coordinate of the block</param>
+	/// <param name="z">remote local z coordinate of the block</param>
+	/// <returns>Block position in a remote chunk</returns>
+	public GridPosition CalculateBlockPosition(int x, int y, int z)
+	{
+		return new GridPosition(
+			x & _MaskX,
+			y & _MaskY,
+			z & _MaskZ
+			);
+	}
 }

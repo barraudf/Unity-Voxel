@@ -46,7 +46,7 @@ public class SimpleMeshBuilder : ChunkMeshBuilder
 	{
 		Vector3[] vertices = new Vector3[4];
 
-		Vector3 finalOrigin = ((Vector3)blockPosition - chunk.ChunkOrigin - chunk.BlockOrigin) * blockScale;
+		Vector3 finalOrigin = (Vector3)blockPosition * blockScale - chunk.ChunkOriginPoint - chunk.BlockOriginPoint;
 		float px = finalOrigin.x;
 		float py = finalOrigin.y;
 		float pz = finalOrigin.z;
