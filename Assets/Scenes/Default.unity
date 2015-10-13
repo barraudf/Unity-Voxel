@@ -187,6 +187,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04ffab3c0ea619a40aecf4cfd81d9df7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ChunkSizeX: 1
+  ChunkSizeY: 1
+  ChunkSizeZ: 1
+  WorldOriginPoint: {x: 0, y: 0, z: 0}
+  BlockOriginPoint: {x: 0, y: 0, z: 0}
+  ChunkOriginPoint: {x: 0, y: 0, z: 0}
+  MultiThreading: 1
 --- !u!114 &777382505
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -201,7 +208,6 @@ MonoBehaviour:
   ChunkSizeX: 16
   ChunkSizeY: 128
   ChunkSizeZ: 16
-  BlockScale: 1
   WorldOriginPoint: {x: 0, y: 0, z: 0}
   BlockOriginPoint: {x: 0, y: 0, z: 0}
   ChunkOriginPoint: {x: 0, y: 0, z: 0}

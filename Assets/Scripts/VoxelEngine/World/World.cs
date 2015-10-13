@@ -115,7 +115,6 @@ public class World : ChunkContainer
 	public WorldChunk LoadChunk(GridPosition position)
 	{
 		WorldChunk chunk = new WorldChunk(this, position);
-		chunk.BlockScale = BlockScale;
 		Chunks.Add(position, chunk);
 		ChunkList.Add(chunk);
 

@@ -8,14 +8,16 @@ public class MVModel : ChunkContainer
 	protected MVChunk _Chunk;
 	#endregion Fields
 
-	protected void Awake()
+	protected override void Awake()
 	{
+		base.Awake();
+		
 		_Loader = new MVLoader();
 		_Unloader = new SimpleUnloader();
 		_MeshBuilder = new GreedyMeshBuilder();
 	}
 
-	private void FixedUpdate()
+	protected void FixedUpdate()
 	{
 		if (_Chunk.DeleteRequested && !_Chunk.Busy)
 		{

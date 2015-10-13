@@ -42,11 +42,11 @@ public class SimpleMeshBuilder : ChunkMeshBuilder
 			BuildFace(blockPosition, block, direction, chunk, meshBuilder, chunk.BlockScale);
 	}
 
-	private void BuildFace(GridPosition blockPosition, Block block, Direction direction, Chunk chunk, MeshBuilder meshBuilder, float blockScale)
+	private void BuildFace(GridPosition blockPosition, Block block, Direction direction, Chunk chunk, MeshBuilder meshBuilder, Vector3 blockScale)
 	{
 		Vector3[] vertices = new Vector3[4];
 
-		Vector3 finalOrigin = (Vector3)blockPosition * blockScale - chunk.ChunkOriginPoint - chunk.BlockOriginPoint;
+		Vector3 finalOrigin = Vector3.Scale(blockPosition, blockScale) - chunk.ChunkOriginPoint - chunk.BlockOriginPoint;
 		float px = finalOrigin.x;
 		float py = finalOrigin.y;
 		float pz = finalOrigin.z;
@@ -66,40 +66,40 @@ public class SimpleMeshBuilder : ChunkMeshBuilder
 		switch (direction)
 		{
 			case Direction.Up:
-				vertices[0] = new Vector3(px,				py + blockScale,	pz);				// 3
-				vertices[1] = new Vector3(px,				py + blockScale,	pz + blockScale);	// 4	
-				vertices[2] = new Vector3(px + blockScale,	py + blockScale,	pz + blockScale);	// 8
-				vertices[3] = new Vector3(px + blockScale,	py + blockScale,	pz);				// 7
+				vertices[0] = new Vector3(px,					py + blockScale.y,	pz);				// 3
+				vertices[1] = new Vector3(px,					py + blockScale.y,	pz + blockScale.z);	// 4
+				vertices[2] = new Vector3(px + blockScale.x,	py + blockScale.y,	pz + blockScale.z);	// 8
+				vertices[3] = new Vector3(px + blockScale.x,	py + blockScale.y,	pz);				// 7
 				break;
 			case Direction.Down:
-				vertices[0] = new Vector3(px,				py,					pz + blockScale);	// 2
-				vertices[1] = new Vector3(px,				py,					pz);				// 1
-				vertices[2] = new Vector3(px + blockScale,	py,					pz);				// 5
-				vertices[3] = new Vector3(px + blockScale,	py,					pz + blockScale);	// 6
+				vertices[0] = new Vector3(px,					py,					pz + blockScale.z);	// 2
+				vertices[1] = new Vector3(px,					py,					pz);				// 1
+				vertices[2] = new Vector3(px + blockScale.x,	py,					pz);				// 5
+				vertices[3] = new Vector3(px + blockScale.x,	py,					pz + blockScale.z);	// 6
 				break;
 			case Direction.Right:
-				vertices[0] = new Vector3(px + blockScale,	py + blockScale,	pz);				// 7
-				vertices[1] = new Vector3(px + blockScale,	py + blockScale,	pz + blockScale);	// 8
-				vertices[2] = new Vector3(px + blockScale,	py,					pz + blockScale);	// 6
-				vertices[3] = new Vector3(px + blockScale,	py,					pz);				// 5
+				vertices[0] = new Vector3(px + blockScale.x,	py + blockScale.y,	pz);				// 7
+				vertices[1] = new Vector3(px + blockScale.x,	py + blockScale.y,	pz + blockScale.z);	// 8
+				vertices[2] = new Vector3(px + blockScale.x,	py,					pz + blockScale.z);	// 6
+				vertices[3] = new Vector3(px + blockScale.x,	py,					pz);				// 5
 				break;
 			case Direction.Left:
-				vertices[0] = new Vector3(px,				py + blockScale,	pz + blockScale);	// 4
-				vertices[1] = new Vector3(px,				py + blockScale,	pz);				// 3
-				vertices[2] = new Vector3(px,				py,					pz);				// 1
-				vertices[3] = new Vector3(px,				py,					pz + blockScale);	// 2
+				vertices[0] = new Vector3(px,					py + blockScale.y,	pz + blockScale.z);	// 4
+				vertices[1] = new Vector3(px,					py + blockScale.y,	pz);				// 3
+				vertices[2] = new Vector3(px,					py,					pz);				// 1
+				vertices[3] = new Vector3(px,					py,					pz + blockScale.z);	// 2
 				break;
 			case Direction.Forward:
-				vertices[0] = new Vector3(px + blockScale,	py + blockScale,	pz + blockScale);	// 8
-				vertices[1] = new Vector3(px,				py + blockScale,	pz + blockScale);	// 4
-				vertices[2] = new Vector3(px,				py,					pz + blockScale);	// 2
-				vertices[3] = new Vector3(px + blockScale,	py,					pz + blockScale);	// 6
+				vertices[0] = new Vector3(px + blockScale.x,	py + blockScale.y,	pz + blockScale.z);	// 8
+				vertices[1] = new Vector3(px,					py + blockScale.y,	pz + blockScale.z);	// 4
+				vertices[2] = new Vector3(px,					py,					pz + blockScale.z);	// 2
+				vertices[3] = new Vector3(px + blockScale.x,	py,					pz + blockScale.z);	// 6
 				break;
 			case Direction.Backward:
-				vertices[0] = new Vector3(px,				py + blockScale,	pz);				// 3
-				vertices[1] = new Vector3(px + blockScale,	py + blockScale,	pz);				// 7
-				vertices[2] = new Vector3(px + blockScale,	py,					pz);				// 5
-				vertices[3] = new Vector3(px,				py,					pz);				// 1
+				vertices[0] = new Vector3(px,					py + blockScale.y,	pz);				// 3
+				vertices[1] = new Vector3(px + blockScale.x,	py + blockScale.y,	pz);				// 7
+				vertices[2] = new Vector3(px + blockScale.x,	py,					pz);				// 5
+				vertices[3] = new Vector3(px,					py,					pz);				// 1
 				break;
 		}
 

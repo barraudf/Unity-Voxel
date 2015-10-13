@@ -298,10 +298,7 @@ public class MVChunk : Chunk
 	public override bool GetHitBox(RaycastHit hit, out GridPosition position, out Vector3 size)
 	{
 		position = GridPosition.Zero;
-		size = new Vector3(
-			SizeX * BlockScale,
-			SizeY * BlockScale,
-			SizeZ * BlockScale);
+		size = Vector3.Scale(new Vector3(SizeX, SizeY, SizeZ), BlockScale);
 		return true;
 	}
 }

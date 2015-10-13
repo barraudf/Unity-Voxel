@@ -47,7 +47,7 @@ public abstract class Chunk
 	/// <summary>
 	/// Scale of the blocks. Default is 1, which is equal to 1 unity unit.
 	/// </summary>
-	public float BlockScale;
+	public Vector3 BlockScale { get { return _Container.BlockScale; } }
 
 	protected ChunkContainer _Container;
 
@@ -59,7 +59,6 @@ public abstract class Chunk
 		DeleteRequested = false;
 		MeshDataLoaded = false;
 		Busy = false;
-		BlockScale = 1f;
 	}
 
 	public virtual void InitBlocks(int sizeX, int sizeY, int sizeZ)
@@ -189,12 +188,12 @@ public abstract class Chunk
 		return false;
 	}
 
-	protected float MoveWithinBlock(float pos, float norm, bool adjacent = false)
+	protected static float MoveWithinBlock(float pos, float norm, float scale, bool adjacent = false)
 	{
-		if (pos  % BlockScale == 0)
+		if (pos  % scale == 0)
 		{
 			if ((norm < 0 && adjacent) || (norm > 0 && !adjacent))
-				pos -= BlockScale;
+				pos -= scale;
 		}
 
 		return (float)pos;
@@ -204,12 +203,12 @@ public abstract class Chunk
 	{
 		Vector3 localHitPos = GetLocalPosition(hit.point);
 		Vector3 pos = new Vector3(
-			MoveWithinBlock(localHitPos.x, hit.normal.x, adjacent),
-			MoveWithinBlock(localHitPos.y, hit.normal.y, adjacent),
-			MoveWithinBlock(localHitPos.z, hit.normal.z, adjacent)
+			MoveWithinBlock(localHitPos.x, hit.normal.x, BlockScale.x, adjacent),
+			MoveWithinBlock(localHitPos.y, hit.normal.y, BlockScale.y, adjacent),
+			MoveWithinBlock(localHitPos.z, hit.normal.z, BlockScale.z, adjacent)
 			);
 
-		return new GridPosition(Mathf.FloorToInt(pos.x / BlockScale), Mathf.FloorToInt(pos.y / BlockScale), Mathf.FloorToInt(pos.z / BlockScale));
+		return new GridPosition(Mathf.FloorToInt(pos.x / BlockScale.x), Mathf.FloorToInt(pos.y / BlockScale.y), Mathf.FloorToInt(pos.z / BlockScale.z));
 	}
 
 	protected virtual Vector3 GetLocalPosition(Vector3 globalPosition)

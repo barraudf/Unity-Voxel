@@ -62,11 +62,11 @@ public class WorldChunk : Chunk
 	/// <returns></returns>
 	public Vector3 GetGlobalPosition()
 	{
-		return new Vector3(
-			(Position.x * World.ChunkSizeX * World.BlockScale) - World.WorldOriginPoint.x,
-			(Position.y * World.ChunkSizeY * World.BlockScale) - World.WorldOriginPoint.y,
-			(Position.z * World.ChunkSizeZ * World.BlockScale) - World.WorldOriginPoint.z
-			);
+		return Vector3.Scale(new Vector3(
+			Position.x * World.ChunkSizeX,
+			Position.y * World.ChunkSizeY,
+			Position.z * World.ChunkSizeZ
+			), World.BlockScale) - World.WorldOriginPoint;
 	}
 
 	protected override Vector3 GetLocalPosition(Vector3 globalPosition)
@@ -82,7 +82,7 @@ public class WorldChunk : Chunk
 
 		if (GetBlock(blockPosition.x, blockPosition.y, blockPosition.z) != null)
 		{
-			size = new Vector3(BlockScale, BlockScale, BlockScale);
+			size = BlockScale;
 			position = blockPosition;
 			return true;
 		}

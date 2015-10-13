@@ -18,7 +18,8 @@ public class WorldNavigator : MonoBehaviour
 
 	private void Start ()
 	{
-		World.RegisterNavigator(this);
+		Profiler.maxNumberOfSamplesPerFrame = 8000000;
+        World.RegisterNavigator(this);
 		Position = GetChunkPositionFromRealPosition();
 
 		_Style = new GUIStyle { normal = new GUIStyleState { textColor = Color.black } };
@@ -101,9 +102,9 @@ public class WorldNavigator : MonoBehaviour
 	private GridPosition GetChunkPositionFromRealPosition()
 	{
 		return new GridPosition(
-			Mathf.FloorToInt(((transform.position.x + World.BlockOriginPoint.x + World.ChunkOriginPoint.x + World.WorldOriginPoint.x) / World.BlockScale) / (float)World.ChunkSizeX),
-			Mathf.FloorToInt(((transform.position.y + World.BlockOriginPoint.y + World.ChunkOriginPoint.y + World.WorldOriginPoint.y) / World.BlockScale) / (float)World.ChunkSizeY),
-			Mathf.FloorToInt(((transform.position.z + World.BlockOriginPoint.z + World.ChunkOriginPoint.z + World.WorldOriginPoint.z) / World.BlockScale) / (float)World.ChunkSizeZ)
+			Mathf.FloorToInt(((transform.position.x + World.BlockOriginPoint.x + World.ChunkOriginPoint.x + World.WorldOriginPoint.x) / World.BlockScale.x) / (float)World.ChunkSizeX),
+			Mathf.FloorToInt(((transform.position.y + World.BlockOriginPoint.y + World.ChunkOriginPoint.y + World.WorldOriginPoint.y) / World.BlockScale.y) / (float)World.ChunkSizeY),
+			Mathf.FloorToInt(((transform.position.z + World.BlockOriginPoint.z + World.ChunkOriginPoint.z + World.WorldOriginPoint.z) / World.BlockScale.z) / (float)World.ChunkSizeZ)
 			);
 	}
 

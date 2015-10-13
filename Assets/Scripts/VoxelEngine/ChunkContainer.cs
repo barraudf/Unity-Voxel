@@ -23,7 +23,7 @@ public abstract class ChunkContainer : MonoBehaviour
 	/// <summary>
 	/// Size of each block (in Unity unit)
 	/// </summary>
-	public float BlockScale = 1f;
+	public Vector3 BlockScale { get { return _BlockScale; } }
 
 	/// <summary>
 	/// Origin point of the world
@@ -48,6 +48,10 @@ public abstract class ChunkContainer : MonoBehaviour
 	protected ChunkLoader _Loader;
 	protected ChunkMeshBuilder _MeshBuilder;
 	protected ChunkUnloader _Unloader;
+
+	private Vector3 _BlockScale;
+
+	private static IThreadPool _ThreadPool;
 	#endregion Fields
 
 	protected virtual void Load(Chunk chunk)
@@ -95,4 +99,9 @@ public abstract class ChunkContainer : MonoBehaviour
 			chunkMesh.Chunk = chunk;
 		}
 	}
+
+	protected virtual void Awake()
+	{
+		_BlockScale = transform.localScale;
+    }
 }
