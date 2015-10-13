@@ -45,6 +45,8 @@ public abstract class ChunkContainer : MonoBehaviour
 	/// </summary>
 	public bool MultiThreading = true;
 
+	protected static IThreadPool ThreadPool { get { return _ThreadPool; } }
+
 	protected ChunkLoader _Loader;
 	protected ChunkMeshBuilder _MeshBuilder;
 	protected ChunkUnloader _Unloader;
@@ -53,6 +55,11 @@ public abstract class ChunkContainer : MonoBehaviour
 
 	private static IThreadPool _ThreadPool;
 	#endregion Fields
+
+	static ChunkContainer()
+	{
+		_ThreadPool = new CustomThreadPool(false);
+	}
 
 	protected virtual void Load(Chunk chunk)
 	{

@@ -44,9 +44,11 @@ public class World : ChunkContainer
 	protected int _LogSizeX, _LogSizeY, _LogSizeZ;
 	#endregion fields
 
-	protected void Awake()
+	protected override void Awake()
 	{
-		_Loader = new SampleSimpleChunkLoader();
+		base.Awake();
+
+		_Loader = new SampleChunkLoader();
 		_Unloader = new SimpleUnloader();
 		_MeshBuilder = new GreedyMeshBuilder();
 
@@ -66,7 +68,7 @@ public class World : ChunkContainer
 		_MaskZ = ChunkSizeZ - 1;
 	}
 
-	private void FixedUpdate()
+	protected void FixedUpdate()
 	{
 		UnloadChunksOutOfRange();
 
@@ -121,7 +123,7 @@ public class World : ChunkContainer
 		if (!chunk.BlocksLoaded)
 		{
 			if (MultiThreading)
-				new Thread(() => { Load(chunk); }).Start();
+				ThreadPool.QueueUserWorkItem(c => { Load(chunk); });
 			else
 				Load(chunk);
 		}
@@ -140,7 +142,7 @@ public class World : ChunkContainer
 
 		if (MultiThreading)
 		{
-			new Thread(() =>
+			ThreadPool.QueueUserWorkItem(c =>
 			{
 				if (!chunk.UpdatePending)
 				{
@@ -156,7 +158,7 @@ public class World : ChunkContainer
 
 					Build(chunk);
 				}
-			}).Start();
+			});
 		}
 		else
 		{
@@ -219,7 +221,7 @@ public class World : ChunkContainer
 				}
 
 		if (MultiThreading)
-			new Thread(() => { BuildChunkColumn(columnPosition); }).Start();
+			ThreadPool.QueueUserWorkItem(c => { BuildChunkColumn(columnPosition); });
 		else
 			BuildChunkColumn(columnPosition);
 	}
@@ -278,7 +280,7 @@ public class World : ChunkContainer
 		}
 
 		if (MultiThreading)
-			new Thread(() => { Unload(chunk); }).Start();
+			ThreadPool.QueueUserWorkItem(c => { Unload(chunk); });
 		else
 			Unload(chunk);
 	}
