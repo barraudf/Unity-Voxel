@@ -41,7 +41,7 @@ public class WorldNavigator : MonoBehaviour
 	private void DoUpdate()
 	{
 		GridPosition currentChunkPosition = GetChunkPositionFromRealPosition();
-        if (_Done = true && !currentChunkPosition.Equals(Position))
+        if (!currentChunkPosition.Equals(Position))
 		{
 			_LastI = 0;
 			Position = currentChunkPosition;
@@ -80,10 +80,6 @@ public class WorldNavigator : MonoBehaviour
 		for (int i = _LastI; i < ChunkLoadOrder.Length; i++)
 		{
 			_LastI = i;
-			if (++cpt > MaxLoadPerFrame)
-			{
-				return;
-			}
 
 			GridPosition newChunkPosition = currentChunkPosition + ChunkLoadOrder[i];
 			newChunkPosition.y = 0;
@@ -94,6 +90,9 @@ public class WorldNavigator : MonoBehaviour
 				continue;
 
 			World.LoadChunkColumn(newChunkPosition);
+
+			if (++cpt > MaxLoadPerFrame)
+				return;
 		}
 		_LastI = 0;
 		_Done = true;

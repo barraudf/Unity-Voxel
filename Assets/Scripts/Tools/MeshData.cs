@@ -6,12 +6,14 @@ public class MeshData
 	private Vector3[] Vertices;
 	private int[][] Triangles;
 	private Color32[] Colors;
+	private Vector3[] Normals;
 
-	public MeshData(Vector3[] vertices, int[][] triangles, Color32[] colors)
+	public MeshData(Vector3[] vertices, int[][] triangles, Color32[] colors, Vector3[] normals)
 	{
 		Vertices = vertices;
 		Triangles = triangles;
 		Colors = colors;
+		Normals = normals;
 	}
 
 	public Mesh ToMesh()
@@ -25,7 +27,7 @@ public class MeshData
 			else
 				mesh.SetTriangles(new int[3] { 0, 0, 0 }, i); // Required because MeshCollider don't work with empty submeshes
 		mesh.colors32 = Colors;
-		mesh.RecalculateNormals();
+		mesh.normals = Normals;
 		return mesh;
 	}
 }

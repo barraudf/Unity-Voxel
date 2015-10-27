@@ -18,7 +18,7 @@ public class SimpleMeshBuilder : ChunkMeshBuilder
 				for (int z = 0; z < chunk.SizeZ; z++)
 				{
 					Block block = chunk.GetBlock(x, y, z);
-					if (block != null)
+					if (block.Type != Block.BlockTypes.Air)
 					{
 						GridPosition blockPosition = new GridPosition(x, y, z);
                         ProcessFace(block, blockPosition, Direction.Up,			chunk, meshBuilder);
@@ -35,7 +35,7 @@ public class SimpleMeshBuilder : ChunkMeshBuilder
 
 	private	void ProcessFace(Block block, GridPosition blockPosition, Direction direction, Chunk chunk, MeshBuilder meshBuilder)
 	{
-		GridPosition otherBlockPosition = blockPosition + direction.ToUnitVector();
+		GridPosition otherBlockPosition = blockPosition + direction.ToPositionOffset();
 		Block otherBlock = chunk.GetBlock(otherBlockPosition.x, otherBlockPosition.y, otherBlockPosition.z);
 
 		if (block.IsFaceVisible(direction.Opposite(), otherBlock))
@@ -103,6 +103,6 @@ public class SimpleMeshBuilder : ChunkMeshBuilder
 				break;
 		}
 
-		meshBuilder.AddQuad(vertices, block.GetBlockColor(), block.GetSubMesh());
+		meshBuilder.AddQuad(vertices, block.Color, block.GetSubMesh(), direction.ToUnitVector());
 	}
 }

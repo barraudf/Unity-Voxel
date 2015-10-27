@@ -7,7 +7,7 @@ public class GreedyMeshBuilder : ChunkMeshBuilder
     public override MeshData[] BuildMeshes(Chunk chunk)
 	{
 		Direction[] directions = (Direction[])Enum.GetValues(typeof(Direction));
-		Block[,,,] _Faces = new Block[directions.Length, chunk.SizeX, chunk.SizeY, chunk.SizeZ];
+		bool[,,,] _Faces = new bool[directions.Length, chunk.SizeX, chunk.SizeY, chunk.SizeZ];
 		MeshBuilder meshBuilder = new MeshBuilder();
 		Vector3 blockScale = chunk.BlockScale;
 
@@ -16,16 +16,10 @@ public class GreedyMeshBuilder : ChunkMeshBuilder
 				for (int z = 0; z < chunk.SizeZ; z++)
 				{
 					Block block = chunk.GetBlock(x, y, z);
-					if (block != null)
-					{
-						GridPosition blockPosition = new GridPosition(x, y, z);
+					GridPosition blockPosition = new GridPosition(x, y, z);
 
-						for (int d = 0; d < directions.Length; d++)
-						{
-							if (FaceVisible(block, blockPosition, directions[d], chunk))
-								_Faces[d, x, y, z] = block;
-						}
-					}
+					for (int d = 0; d < directions.Length; d++)
+						_Faces[d, x, y, z] = FaceVisible(block, blockPosition, directions[d], chunk);
 				}
 
 		for (int d = 0; d < directions.Length; d++)
@@ -36,11 +30,10 @@ public class GreedyMeshBuilder : ChunkMeshBuilder
 					for (int z = 0; z < chunk.SizeZ; z++)
 					{
 
-						Block block = _Faces[d, x, y, z];
-
-						if (block != null)
+						if(_Faces[d, x, y, z])
 						{
-							Vector3 blockPosition = new GridPosition(x, y, z);
+							Block block = chunk.GetBlock(x, y, z);
+                            Vector3 blockPosition = new Vector3(x, y, z);
 							Vector3 finalOrigin = Vector3.Scale(blockPosition, blockScale) - chunk.ChunkOriginPoint - chunk.BlockOriginPoint;
 							float px = finalOrigin.x;
 							float py = finalOrigin.y;
@@ -53,7 +46,7 @@ public class GreedyMeshBuilder : ChunkMeshBuilder
 								case Direction.Left:
 									{
 										ry = y + 1;
-										while (ry < chunk.SizeY && SameColor(block, _Faces[d, x, ry, z]))
+										while (ry < chunk.SizeY && _Faces[d, x, ry, z] && SameColor(block, chunk.GetBlock(x, ry, z)))
 											ry++;
 										ry--;
 
@@ -63,7 +56,7 @@ public class GreedyMeshBuilder : ChunkMeshBuilder
 											bool inc = true;
 											for (int k = y; k <= ry; ++k)
 											{
-												inc = inc & (SameColor(block, _Faces[d, x, k, rz]));
+												inc = inc & (_Faces[d, x, k, rz] && SameColor(block, chunk.GetBlock(x, k, rz)));
 											}
 
 											if (inc)
@@ -79,7 +72,7 @@ public class GreedyMeshBuilder : ChunkMeshBuilder
 								case Direction.Down:
 									{
 										rx = x + 1;
-										while (rx < chunk.SizeX && SameColor(block, _Faces[d, rx, y, z]))
+										while (rx < chunk.SizeX && _Faces[d, rx, y, z] && SameColor(block, chunk.GetBlock(rx, y, z)))
 											rx++;
 										rx--;
 
@@ -89,7 +82,7 @@ public class GreedyMeshBuilder : ChunkMeshBuilder
 											bool inc = true;
 											for (int k = x; k <= rx; ++k)
 											{
-												inc = inc & (SameColor(block, _Faces[d, k, y, rz]));
+												inc = inc & (_Faces[d, k, y, rz] && SameColor(block, chunk.GetBlock(k, y, rz)));
 											}
 
 											if (inc)
@@ -105,7 +98,7 @@ public class GreedyMeshBuilder : ChunkMeshBuilder
 								case Direction.Backward:
 									{
 										rx = x + 1;
-										while (rx < chunk.SizeX && SameColor(block, _Faces[d, rx, y, z]))
+										while (rx < chunk.SizeX && _Faces[d, rx, y, z] && SameColor(block, chunk.GetBlock(rx, y, z)))
 											rx++;
 										rx--;
 
@@ -115,7 +108,7 @@ public class GreedyMeshBuilder : ChunkMeshBuilder
 											bool inc = true;
 											for (int k = x; k <= rx; ++k)
 											{
-												inc = inc & (SameColor(block, _Faces[d, k, ry, z]));
+												inc = inc & (_Faces[d, k, ry, z] && SameColor(block, chunk.GetBlock(k, ry, z)));
 											}
 
 											if (inc)
@@ -136,7 +129,7 @@ public class GreedyMeshBuilder : ChunkMeshBuilder
 									for (int kz = z; kz <= rz; kz++)
 									{
 										if (kx != x || ky != y || kz != z)
-											_Faces[d, kx, ky, kz] = null;
+											_Faces[d, kx, ky, kz] = false;
 									}
 								}
 							}
@@ -191,7 +184,7 @@ public class GreedyMeshBuilder : ChunkMeshBuilder
 									break;
 							}
 
-							meshBuilder.AddQuad(vertices, block.GetBlockColor(), block.GetSubMesh());
+							meshBuilder.AddQuad(vertices, block.Color, block.GetSubMesh(), dir.ToUnitVector());
 						}
 					}
 		}
@@ -201,7 +194,7 @@ public class GreedyMeshBuilder : ChunkMeshBuilder
 
 	private bool FaceVisible(Block block, GridPosition blockPosition, Direction direction, Chunk chunk)
 	{
-		GridPosition otherBlockPosition = blockPosition + direction.ToUnitVector();
+		GridPosition otherBlockPosition = blockPosition + direction.ToPositionOffset();
 		Block otherBlock = chunk.GetBlock(otherBlockPosition.x, otherBlockPosition.y, otherBlockPosition.z);
 
 		bool visible = block.IsFaceVisible(direction.Opposite(), otherBlock);
@@ -210,11 +203,8 @@ public class GreedyMeshBuilder : ChunkMeshBuilder
 
 	private bool SameColor(Block b1, Block b2)
 	{
-		if (b2 == null)
-			return false;
-
-		Color32 c1 = b1.GetBlockColor();
-		Color32 c2 = b2.GetBlockColor();
+		Color32 c1 = b1.Color;
+		Color32 c2 = b2.Color;
 
 		return c1.a == c2.a && c1.b == c2.b && c1.g == c2.g && c1.r == c2.r;
 	}

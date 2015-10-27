@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System;
 
 [Serializable]
-public abstract class Block
+public struct Block
 {
+	public enum BlockTypes : byte { Air, Solid };
+
 	#region Fields
-	/// <summary>
-	/// Stores the color of each block type loaded
-	/// </summary>
-	[NonSerialized]
-	protected static Dictionary<Type, Color32> Colors = new Dictionary<Type, Color32>();
+	public Color32 Color;
+	public BlockTypes Type;
 	#endregion Fields
 
 	/// <summary>
@@ -18,27 +17,18 @@ public abstract class Block
 	/// </summary>
 	/// <param name="direction"></param>
 	/// <returns></returns>
-	public virtual bool IsSolid(Direction direction)
+	public bool IsSolid(Direction direction)
 	{
-		return true;
-	}
-
-	/// <summary>
-	/// Determines the color of the block
-	/// </summary>
-	/// <returns>the color of the block</returns>
-	public virtual Color32 GetBlockColor()
-	{
-		return Colors[GetType()];
+		return Type != BlockTypes.Air;
 	}
 
 	/// <summary>
 	/// Determines which submesh the block belongs to
 	/// </summary>
 	/// <returns>the submesh</returns>
-	public virtual SubMeshes GetSubMesh()
+	public SubMeshes GetSubMesh()
 	{
-		return SubMeshes.Opac;
+		return Color.a == 255 ? SubMeshes.Opac : SubMeshes.Transparent;
 	}
 
 	/// <summary>
@@ -47,8 +37,8 @@ public abstract class Block
 	/// <param name="direction">Direction (from [adjacentBlock] to current block)</param>
 	/// <param name="adjacentBlock">the block next to this one</param>
 	/// <returns>True if the face should be renderer, false otherwise</returns>
-	public virtual bool IsFaceVisible(Direction direction, Block adjacentBlock)
+	public bool IsFaceVisible(Direction direction, Block adjacentBlock)
 	{
-		return adjacentBlock == null || !adjacentBlock.IsSolid(direction);
+		return IsSolid(direction) && (!adjacentBlock.IsSolid(direction) || adjacentBlock.Color.a != Color.a);
 	}
 }

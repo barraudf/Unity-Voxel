@@ -50,7 +50,7 @@ public class World : ChunkContainer
 
 		_Loader = new SampleChunkLoader();
 		_Unloader = new SimpleUnloader();
-		_MeshBuilder = new GreedyMeshBuilder();
+		_MeshBuilder = new SimpleMeshBuilder();
 
 		_Navigators = new List<WorldNavigator>();
 		_Pool = GetComponent<ObjectPool>();
@@ -120,13 +120,10 @@ public class World : ChunkContainer
 		Chunks.Add(position, chunk);
 		ChunkList.Add(chunk);
 
-		if (!chunk.BlocksLoaded)
-		{
-			if (MultiThreading)
-				ThreadPool.QueueUserWorkItem(c => { Load(chunk); });
-			else
-				Load(chunk);
-		}
+		if (MultiThreading)
+			ThreadPool.QueueUserWorkItem(c => { Load(chunk); });
+		else
+			Load(chunk);
 
 		return chunk;
 	}
@@ -295,11 +292,6 @@ public class World : ChunkContainer
 		{
 			_LastIndexUnloaded = i;
 
-			if (++cpt > MaxUnloadPerFrame)
-			{
-				return;
-			}
-
 			bool isInRange = false;
 			for (int j = 0; j < _Navigators.Count; j++)
 			{
@@ -312,7 +304,12 @@ public class World : ChunkContainer
 			}
 
 			if (!isInRange)
+			{
 				UnloadChunk(_UnloadingList[i]);
+
+				if (++cpt > MaxUnloadPerFrame)
+					return;
+			}
 		}
 		_LastIndexUnloaded = 0;
 		_UnloadingList = null;
@@ -342,13 +339,13 @@ public class World : ChunkContainer
 	}
 
 	/// <summary>
-	/// Calculate the chunk position (relative to the current chunk) of a block of the given local coordinates
+	/// Calculate the chunk position of a block of the given global coordinates
 	/// </summary>
-	/// <param name="x">x coordinate of the block, relative to the current chunk</param>
-	/// <param name="y">y coordinate of the block, relative to the current chunk</param>
-	/// <param name="z">z coordinate of the block, relative to the current chunk</param>
+	/// <param name="x">x coordinate of the block</param>
+	/// <param name="y">y coordinate of the block</param>
+	/// <param name="z">z coordinate of the block</param>
 	/// <returns>chunk position</returns>
-	public GridPosition CalculateChunkOffset(int x, int y, int z)
+	public GridPosition CalculateChunkPosition(int x, int y, int z)
 	{
 		return new GridPosition(
 			x >> _LogSizeX,
@@ -358,7 +355,7 @@ public class World : ChunkContainer
 	}
 
 	/// <summary>
-	/// Calculate the local coordinates of a block in another chunk
+	/// Calculate the local coordinates of a block in a chunk
 	/// </summary>
 	/// <param name="x">remote local x coordinate of the block</param>
 	/// <param name="y">remote local y coordinate of the block</param>
@@ -371,5 +368,31 @@ public class World : ChunkContainer
 			y & _MaskY,
 			z & _MaskZ
 			);
+	}
+
+	public Block GetBlock(int x, int y, int z)
+	{
+		GridPosition chunkPos = CalculateChunkPosition(x, y, z);
+		WorldChunk chunk = GetChunk(chunkPos);
+
+		if(chunk != null)
+		{
+			GridPosition blockPos = CalculateBlockPosition(x, y, z);
+			return chunk.GetBlock(blockPos.x, blockPos.y, blockPos.z, true);
+		}
+
+		return new Block { Type = Block.BlockTypes.Air };
+	}
+
+	public void SetBlock(int x, int y, int z, Block block, bool rebuildMesh)
+	{
+		GridPosition chunkPos = CalculateChunkPosition(x, y, z);
+		WorldChunk chunk = GetChunk(chunkPos);
+
+		if (chunk != null)
+		{
+			GridPosition blockPos = CalculateBlockPosition(x, y, z);
+			chunk.SetBlock(blockPos.x, blockPos.y, blockPos.z, block, rebuildMesh, true);
+		}
 	}
 }

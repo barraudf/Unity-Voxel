@@ -127,15 +127,6 @@ public struct GridPosition
 		value1.z *= value2.z;
 		return value1;
 	}
-
-	public static GridPosition operator /(GridPosition value1, GridPosition value2)
-	{
-		Vector3 v2 = value2;
-		value1.x = Mathf.FloorToInt(value1.x / v2.x);
-		value1.y = Mathf.FloorToInt(value1.y / v2.y);
-		value1.z = Mathf.FloorToInt(value1.z / v2.z);
-		return value1;
-	}
 	#endregion Operators
 
 	public static double DistanceSquared(GridPosition value1, GridPosition value2)
@@ -155,11 +146,6 @@ public struct GridPosition
 	public override string ToString()
 	{
 		return string.Format("GridPosition({0},{1},{2})", x, y, z);
-	}
-
-	public static implicit operator GridPosition(Vector3 v)
-	{
-		return new GridPosition((int)v.x, (int)v.y, (int)v.z);
 	}
 
 	public static implicit operator Vector3(GridPosition pos)

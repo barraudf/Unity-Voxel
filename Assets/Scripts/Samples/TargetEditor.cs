@@ -66,9 +66,9 @@ public class TargetEditor : MonoBehaviour
 		if (_TargetHit)
 		{
 			if (Input.GetButtonDown("Fire1"))
-				_LastChunkHit.SetBlock(_Hit, null);
+				_LastChunkHit.SetBlock(_Hit, new Block { Type = Block.BlockTypes.Air });
 			else if (Input.GetButtonDown("Fire2"))
-				_LastChunkHit.SetBlock(_Hit, SampleBlock.Instance, true);
+				_LastChunkHit.SetBlock(_Hit, new Block { Type = Block.BlockTypes.Solid, Color = new Color32 { a = 255, r = 0, g = 255, b = 0 } }, true);
 		}
 	}
 

@@ -8,6 +8,7 @@ public class MeshBuilder
 	private List<Vector3> _Vertices;
 	private List<int>[] _Triangles;
 	private List<Color32> _Colors;
+	private List<Vector3> _Normals;
 	private List<MeshData> _MeshData;
 
 	public MeshBuilder()
@@ -15,6 +16,7 @@ public class MeshBuilder
 		int submeshesCount = Enum.GetValues(typeof(SubMeshes)).Length;
 
 		_Vertices = new List<Vector3>();
+		_Normals = new List<Vector3>();
 		_Triangles = new List<int>[submeshesCount];
 		for(int i = 0; i < submeshesCount; i++)
 			_Triangles[i] = new List<int>();
@@ -27,7 +29,9 @@ public class MeshBuilder
 	/// </summary>
 	/// <param name="vertices">List of vertices of the quad (order is important!).</param>
 	/// <param name="color">Color to apply to all 4 vertices</param>
-	public void AddQuad(Vector3[] vertices, Color32 color, SubMeshes subMesh)
+	/// <param name="subMesh">Which submesh the quad belongs to</param>
+	/// <param name="normal">normal of  each vertex</param>
+	public void AddQuad(Vector3[] vertices, Color32 color, SubMeshes subMesh, Vector3 normal)
 	{
 		if (!CheckVerticeCount(4, vertices.Length))
 			return;
@@ -36,6 +40,7 @@ public class MeshBuilder
 		{
 			_Vertices.Add(vertices[i]);
 			_Colors.Add(color);
+			_Normals.Add(normal);
 		}
 
 		int vertCount = _Vertices.Count;
@@ -57,7 +62,7 @@ public class MeshBuilder
 		triangles = new int[_Triangles.Length][];
 		for (int i = 0; i < _Triangles.Length; i++)
 			triangles[i] = _Triangles[i].ToArray();
-		MeshData meshData = new MeshData(_Vertices.ToArray(), triangles, _Colors.ToArray());
+		MeshData meshData = new MeshData(_Vertices.ToArray(), triangles, _Colors.ToArray(), _Normals.ToArray());
 		_MeshData.Add(meshData);
 		Clear();
 	}
@@ -71,6 +76,7 @@ public class MeshBuilder
 		for (int i = 0; i < _Triangles.Length; i++)
 			_Triangles[i].Clear();
 		_Colors.Clear();
+		_Normals.Clear();
 	}
 
 	/// <summary>

@@ -25,4 +25,15 @@ public class DirectionsTest
 		Assert.AreEqual(Vector3.back, Direction.Backward.ToUnitVector(), "#5");
 		Assert.AreEqual(Vector3.forward, Direction.Forward.ToUnitVector(), "#6");
 	}
+
+	[Test]
+	public void GridOffsetTest()
+	{
+		Assert.AreEqual(GridPosition.Down, Direction.Down.ToPositionOffset(), "#1");
+		Assert.AreEqual(GridPosition.Up, Direction.Up.ToPositionOffset(), "#2");
+		Assert.AreEqual(GridPosition.Left, Direction.Left.ToPositionOffset(), "#3");
+		Assert.AreEqual(GridPosition.Right, Direction.Right.ToPositionOffset(), "#4");
+		Assert.AreEqual(GridPosition.Backward, Direction.Backward.ToPositionOffset(), "#5");
+		Assert.AreEqual(GridPosition.Forward, Direction.Forward.ToPositionOffset(), "#6");
+	}
 }

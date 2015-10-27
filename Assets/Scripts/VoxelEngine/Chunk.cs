@@ -12,17 +12,17 @@ public abstract class Chunk
 	/// <summary>
 	/// Number of columns on the X axis
 	/// </summary>
-	public int SizeX { get { return Blocks.GetLength(0); } }
+	public int SizeX;
 
 	/// <summary>
 	/// Number of rows on the Y axis
 	/// </summary>
-	public int SizeY { get { return Blocks.GetLength(1); } }
+	public int SizeY;
 
 	/// <summary>
 	/// Number of columns on the Z axis
 	/// </summary>
-	public int SizeZ { get { return Blocks.GetLength(2); } }
+	public int SizeZ;
 
 	/// <summary>
 	/// The pivot point of the mesh
@@ -64,6 +64,10 @@ public abstract class Chunk
 	public virtual void InitBlocks(int sizeX, int sizeY, int sizeZ)
 	{
 		Blocks = new Block[sizeX, sizeY, sizeZ];
+		SizeX = sizeX;
+		SizeY = sizeY;
+		SizeZ = sizeZ;
+		
 	}
 
 	#region States of the chunk
@@ -98,41 +102,11 @@ public abstract class Chunk
 	public bool UpdatePending;
 	#endregion States of the chunk
 
-	private bool IsLocalCoordinate(int index, Direction direction)
-	{
-		bool isLocal = true;
-		if (index < 0)
-			isLocal = false;
-		else
-			switch (direction)
-			{
-				case Direction.Right:
-				case Direction.Left:
-					isLocal = index < SizeX;
-					break;
-				case Direction.Up:
-				case Direction.Down:
-					isLocal = index < SizeY;
-					break;
-				case Direction.Forward:
-				case Direction.Backward:
-					isLocal = index < SizeZ;
-					break;
-			}
-
-		return isLocal;
-	}
-
-	private bool IsLocalCoordinateX(int index) { return IsLocalCoordinate(index, Direction.Left); }
-	private bool IsLocalCoordinateY(int index) { return IsLocalCoordinate(index, Direction.Up); }
-	private bool IsLocalCoordinateZ(int index) { return IsLocalCoordinate(index, Direction.Forward); }
-	public bool IsLocalCoordinates(GridPosition pos)
-	{
-		return IsLocalCoordinates(pos.x, pos.y, pos.z);
-	}
 	public bool IsLocalCoordinates(int x, int y, int z)
 	{
-		return IsLocalCoordinateX(x) && IsLocalCoordinateY(y) && IsLocalCoordinateZ(z);
+		return x >= 0 && x < SizeX
+			&& y >= 0 && y < SizeY
+			&& z >= 0 && z < SizeZ;
 	}
 
 	#region get / set blocks
@@ -141,7 +115,7 @@ public abstract class Chunk
 		if (IsLocalCoordinates(x, y, z))
 			return Blocks[x, y, z];
 		else
-			return GetExternalBlock(x, y, z);
+			return new Block { Type = Block.BlockTypes.Air };
 	}
 
 	public virtual void SetBlock(int x, int y, int z, Block block)
@@ -149,7 +123,7 @@ public abstract class Chunk
 		if (IsLocalCoordinates(x, y, z))
 			Blocks[x, y, z] = block;
 		else
-			SetExternalBlock(x, y, z, block);
+			Debug.LogErrorFormat("Can't set block({0},{1},{2}) because it's outside of the chunk", x, y, z);
 	}
 
 	public virtual void SetBlock(RaycastHit hit, Block block, bool adjacent = false)
@@ -157,9 +131,6 @@ public abstract class Chunk
 		GridPosition pos = GetBlockPosition(hit, adjacent);
 		SetBlock(pos.x, pos.y, pos.z, block);
 	}
-
-	protected abstract Block GetExternalBlock(int x, int y, int z);
-	protected abstract void SetExternalBlock(int x, int y, int z, Block block);
 	#endregion get / set blocks
 
 	#region chunk operations
@@ -174,7 +145,7 @@ public abstract class Chunk
 					GridPosition blockPosition = position + new GridPosition( Mathf.RoundToInt(vect.x), Mathf.RoundToInt(vect.y), Mathf.RoundToInt(vect.z) );
 
 					Block block = otherChunk.GetBlock(x,y,z);
-					if(block != null || ConsiderEmptyBlocks)
+					if(block.Type != Block.BlockTypes.Air || ConsiderEmptyBlocks)
 						SetBlock(blockPosition.x, blockPosition.y, blockPosition.z, block);
 				}
     }

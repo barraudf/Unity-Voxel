@@ -4,8 +4,8 @@ using System;
 
 public class MVChunk : Chunk
 {
-	#region default_palatte
-	public static Color[] DefaultPalatte = new Color[] {
+	#region default_palette
+	public static Color[] DefaultPalette = new Color[] {
 		new Color(1.000000f, 1.000000f, 1.000000f),
 		new Color(1.000000f, 1.000000f, 0.800000f),
 		new Color(1.000000f, 1.000000f, 0.600000f),
@@ -269,19 +269,18 @@ public class MVChunk : Chunk
 	public string Name;
 	public byte[] Version;
 
+	private byte[,,] _ColorIndexes;
+
 	public MVChunk(MVModel model)
 		:base(model)
 	{
 
 	}
 
-	protected override Block GetExternalBlock(int x, int y, int z)
+	public override void InitBlocks(int sizeX, int sizeY, int sizeZ)
 	{
-		return null;
-	}
-
-	protected override void SetExternalBlock(int x, int y, int z, Block block)
-	{
+		base.InitBlocks(sizeX, sizeY, sizeZ);
+		_ColorIndexes = new byte[sizeX, sizeY, sizeZ];
 	}
 
 	public void LoadPalette(Texture2D tex)
@@ -293,7 +292,8 @@ public class MVChunk : Chunk
 		}
 
 		Palette = tex.GetPixels();
-	}
+		UpdateColors();
+    }
 
 	public override bool GetHitBox(RaycastHit hit, out GridPosition position, out Vector3 size)
 	{
@@ -301,4 +301,31 @@ public class MVChunk : Chunk
 		size = Vector3.Scale(new Vector3(SizeX, SizeY, SizeZ), BlockScale);
 		return true;
 	}
+
+	public void UpdateColors()
+	{
+		for (int x = 0; x < SizeX; x++)
+			for (int y = 0; y < SizeY; y++)
+				for (int z = 0; z < SizeZ; z++)
+				{
+					int index = _ColorIndexes[x, y, z];
+                    if (Palette.Length > index - 1)
+					{
+						Color32 c = Palette[index - 1];
+						Blocks[x, y, z].Color.r = c.r;
+						Blocks[x, y, z].Color.g = c.g;
+						Blocks[x, y, z].Color.b = c.b;
+					}
+					else
+					{
+						Blocks[x, y, z].Color = Color.magenta;
+						Debug.LogWarningFormat("MVChunk \"{0}\" palette has no color at index {1} (Array index {2})", Name, index, index - 1);
+					}
+				}
+	}
+
+	public void UpdateColorIndex(int x, int y, int z, byte index)
+	{
+		_ColorIndexes[x, y, z] = index;
+    }
 }

@@ -25,37 +25,6 @@ public class WorldChunk : Chunk
 		base.InitBlocks(sizeX, sizeY, sizeZ);
 	}
 
-	#region external block position calculation
-	public override void SetBlock(RaycastHit hit, Block block, bool adjacent = false)
-	{
-		GridPosition pos = GetBlockPosition(hit, adjacent);
-		pos -= Position * new GridPosition(SizeX, SizeY, SizeZ);
-		SetBlock(pos.x, pos.y, pos.z, block);
-	}
-
-	protected override Block GetExternalBlock(int x, int y, int z)
-	{
-		GridPosition chunkOffset = World.CalculateChunkOffset(x, y, z);
-		GridPosition blockRemotePosition = World.CalculateBlockPosition(x, y, z);
-		WorldChunk chunk = World.GetChunk(Position + chunkOffset);
-
-		if (chunk != null)
-			return chunk.GetBlock(blockRemotePosition.x, blockRemotePosition.y, blockRemotePosition.z);
-		else
-			return null;
-	}
-
-	protected override void SetExternalBlock(int x, int y, int z, Block block)
-	{
-		GridPosition chunkOffset = World.CalculateChunkOffset(x, y, z);
-		GridPosition blockRemotePosition = World.CalculateBlockPosition(x, y, z);
-		WorldChunk chunk = World.GetChunk(Position + chunkOffset);
-
-		if (chunk != null)
-			chunk.SetBlock(blockRemotePosition.x, blockRemotePosition.y, blockRemotePosition.z, block);
-	}
-	#endregion external block position calculation
-
 	/// <summary>
 	/// Get the global position of the chunk 
 	/// </summary>
@@ -80,7 +49,7 @@ public class WorldChunk : Chunk
 		GridPosition blockPosition = GetBlockPosition(hit);
 		blockPosition -= Position * new GridPosition(SizeX, SizeY, SizeZ);
 
-		if (GetBlock(blockPosition.x, blockPosition.y, blockPosition.z) != null)
+		if (GetBlock(blockPosition.x, blockPosition.y, blockPosition.z).Type != Block.BlockTypes.Air)
 		{
 			size = BlockScale;
 			position = blockPosition;
@@ -91,36 +60,58 @@ public class WorldChunk : Chunk
 	}
 	#endregion hitbox
 
+	#region get / set blocks
 	public override void SetBlock(int x, int y, int z, Block block)
 	{
 		SetBlock(x, y, z, block, true);
 	}
 
-	public void SetBlock(int x, int y, int z, Block block, bool rebuildMesh)
+	public void SetBlock(int x, int y, int z, Block block, bool rebuildMesh, bool forceLocal = false)
 	{
-		base.SetBlock(x, y, z, block);
-
-		if (IsLocalCoordinates(x, y, z) && rebuildMesh)
+		if (forceLocal || IsLocalCoordinates(x, y, z))
 		{
-			World.BuildChunk(this);
+			Blocks[x, y, z] = block;
 
-			if (x == 0)
-				World.BuildChunk(World.GetChunk(Position + GridPosition.Left));
-			if (x == SizeX - 1)
-				World.BuildChunk(World.GetChunk(Position + GridPosition.Right));
-			if (y == 0)
-				World.BuildChunk(World.GetChunk(Position + GridPosition.Down));
-			if (y == SizeY - 1)
-				World.BuildChunk(World.GetChunk(Position + GridPosition.Up));
-			if (z == 0)
-				World.BuildChunk(World.GetChunk(Position + GridPosition.Backward));
-			if (z == SizeZ - 1)
-				World.BuildChunk(World.GetChunk(Position + GridPosition.Forward));
+			if (IsLocalCoordinates(x, y, z) && rebuildMesh)
+			{
+				World.BuildChunk(this);
+
+				if (x == 0)
+					World.BuildChunk(World.GetChunk(Position + GridPosition.Left));
+				if (x == SizeX - 1)
+					World.BuildChunk(World.GetChunk(Position + GridPosition.Right));
+				if (y == 0)
+					World.BuildChunk(World.GetChunk(Position + GridPosition.Down));
+				if (y == SizeY - 1)
+					World.BuildChunk(World.GetChunk(Position + GridPosition.Up));
+				if (z == 0)
+					World.BuildChunk(World.GetChunk(Position + GridPosition.Backward));
+				if (z == SizeZ - 1)
+					World.BuildChunk(World.GetChunk(Position + GridPosition.Forward));
+			}
+		}
+		else
+		{
+			World.SetBlock(Position.x * SizeX + x, Position.y * SizeY + y, Position.z * SizeZ + z, block, rebuildMesh);
 		}
 	}
+
+	public override Block GetBlock(int x, int y, int z)
+	{
+		return GetBlock(x, y, z, false);
+	}
+
+    public Block GetBlock(int x, int y, int z, bool forceLocal = false)
+	{
+		if (forceLocal || IsLocalCoordinates(x, y, z))
+			return Blocks[x, y, z];
+		else
+			return World.GetBlock(Position.x * SizeX + x, Position.y * SizeY + y, Position.z * SizeZ + z);
+	}
+	#endregion get / set blocks
 
 	public override string ToString()
 	{
 		return string.Format("Chunk({0},{1},{2})", Position.x, Position.y, Position.z);
-	}
+	}	
 }

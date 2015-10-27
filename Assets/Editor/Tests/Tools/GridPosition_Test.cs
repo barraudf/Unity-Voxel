@@ -124,25 +124,6 @@ public class GridPosition_Test
 	}
 
 	[Test]
-	public void OperatorDivisionTest()
-	{
-		GridPosition v1 = new GridPosition(0, 0, 0);
-		GridPosition v2 = new GridPosition(-1, -1, -1);
-		GridPosition v3 = new GridPosition(1, 1, 1);
-		GridPosition v4 = new GridPosition(2, 2, 2);
-		GridPosition v5 = new GridPosition(-2, -2, -2);
-		GridPosition v6 = new GridPosition(4, 4, 4);
-		GridPosition v7 = new GridPosition(-4, -4, -4);
-
-		Assert.AreEqual(v1, v1 / v2, "#1");
-		Assert.AreEqual(v2, v2 / v3, "#2");
-		Assert.AreEqual(v3, v3 / v3, "#3");
-		Assert.AreEqual(v4, v6 / v4, "#4");
-		Assert.AreEqual(v5, v6 / v5, "#5");
-		Assert.AreEqual(v4, v7 / v5, "#6");
-	}
-
-	[Test]
 	public void DistanceSquaredTest()
 	{
 		GridPosition origin = new GridPosition(0, 0, 0);
@@ -171,6 +152,5 @@ public class GridPosition_Test
 	public void OperatorImpliciteTest()
 	{
 		Assert.AreEqual((Vector3)new GridPosition(-1, 2, 3), new Vector3(-1f, 2f, 3f), "#1");
-		Assert.AreEqual((GridPosition)new Vector3(-1.4f, 2.2f, 3.6f), new GridPosition(-1, 2, 3), "#2");
 	}
 }

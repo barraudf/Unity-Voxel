@@ -22,14 +22,19 @@ public class MVModelLayer : MVLayer
 
 	public override void ReadVolxel(MVChunk chunk, int x, int y, int z, byte index)
 	{
-		MVBlock block = chunk.GetBlock(x, y, z) as MVBlock;
-		if (block == null)
+		Block block = chunk.GetBlock(x, y, z);
+		block.Type = Block.BlockTypes.Solid;
+		if (chunk.Palette.Length > index - 1)
 		{
-			block = new MVBlock(chunk);
-			chunk.SetBlock(x, y, z, block);
+			block.Color = chunk.Palette[index - 1];
 		}
-
-		block.ColorIndex = index;
+		else
+		{
+			block.Color = Color.magenta;
+			Debug.LogWarningFormat("MVChunk \"{0}\" palette has no color at index {1} (Array index {2})", chunk.Name, index, index - 1);
+		}
+		chunk.UpdateColorIndex(x, y, z, index);
+		chunk.SetBlock(x, y, z, block);
 	}
 
 	public override void InitPalette(MVChunk chunk)
@@ -39,7 +44,7 @@ public class MVModelLayer : MVLayer
 
 	public override void InitDefaultPalette(MVChunk chunk)
 	{
-		chunk.Palette = MVChunk.DefaultPalatte;
+		chunk.Palette = MVChunk.DefaultPalette;
 	}
 
 	public override void ReadVersion(MVChunk chunk, byte[] version)

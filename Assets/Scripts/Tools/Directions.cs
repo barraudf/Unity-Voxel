@@ -88,4 +88,37 @@ public static class DirectionExtensions
 
 		return normal;
 	}
+
+	public static GridPosition ToPositionOffset(this Direction dir)
+	{
+		GridPosition offset;
+
+		switch (dir)
+		{
+			case Direction.Up:
+				offset = GridPosition.Up;
+				break;
+			case Direction.Down:
+				offset = GridPosition.Down;
+				break;
+			case Direction.Right:
+				offset = GridPosition.Right;
+				break;
+			case Direction.Left:
+				offset = GridPosition.Left;
+				break;
+			case Direction.Forward:
+				offset = GridPosition.Forward;
+				break;
+			case Direction.Backward:
+				offset = GridPosition.Backward;
+				break;
+			default:
+				Debug.LogErrorFormat("Direction \"{0}\" has no position offset defined", dir.ToString());
+				offset = GridPosition.Up;
+				break;
+		}
+
+		return offset;
+	}
 }
