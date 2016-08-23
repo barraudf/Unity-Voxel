@@ -24,7 +24,8 @@ public class MVAlphaLayer : MVLayer
 		if(index == 0)
 			block.Color.a = 255;
 		else
-			block.Color.a = index;
+            block.Color.a = index;
+        chunk.SetBlock(x,y,z, block);
 	}
 
 	public override void InitPalette(MVChunk chunk)
