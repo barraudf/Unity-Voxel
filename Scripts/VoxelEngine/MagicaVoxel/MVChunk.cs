@@ -309,6 +309,10 @@ public class MVChunk : Chunk
 				for (int z = 0; z < SizeZ; z++)
 				{
 					int index = _ColorIndexes[x, y, z];
+
+                    if (index == 0)
+                        continue;
+
                     if (Palette.Length > index - 1)
 					{
 						Color32 c = Palette[index - 1];

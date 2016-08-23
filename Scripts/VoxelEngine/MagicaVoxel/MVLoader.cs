@@ -44,7 +44,10 @@ public class MVLoader : ChunkLoader
 
 	private static void LoadVOXFromData(MVChunk chunk, MVLayer layer, byte[] data)
 	{
-		using (MemoryStream ms = new MemoryStream(data))
+        if (chunk.Palette == null)
+            layer.InitDefaultPalette(chunk);
+
+        using (MemoryStream ms = new MemoryStream(data))
 		{
 			using (BinaryReader br = new BinaryReader(ms))
 			{
@@ -107,9 +110,6 @@ public class MVLoader : ChunkLoader
 						return;
 					}
 				}
-
-				if (chunk.Palette == null)
-					layer.InitDefaultPalette(chunk);
 			}
 		}
 	}

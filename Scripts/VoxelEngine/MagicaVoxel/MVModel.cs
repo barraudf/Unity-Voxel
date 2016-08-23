@@ -19,7 +19,7 @@ public class MVModel : ChunkContainer
 
 	protected void FixedUpdate()
 	{
-		if (_Chunk.DeleteRequested && !_Chunk.Busy)
+		if (_Chunk != null && _Chunk.DeleteRequested && !_Chunk.Busy)
 		{
 			Destroy(this);
 		}
